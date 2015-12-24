@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--Demo TextFields-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController title="Demo TextFields" id="BYZ-38-t0r" customClass="TextFieldValidationVC" customModule="TextFieldValidation" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Textfield 1:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uEw-74-KTV">
+                                <rect key="frame" x="15" y="65" width="118" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <color key="textColor" white="0.63335424269999996" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Only 3 AlphaNumericCharacters Allow" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="UlW-na-iiL" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
+                                <rect key="frame" x="148" y="105" width="437" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Textfield 2:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tr2-91-TEw">
+                                <rect key="frame" x="15" y="105" width="118" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <color key="textColor" white="0.63335424269999996" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Demo TextField's" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kkO-3n-f9g">
+                                <rect key="frame" x="0.0" y="20" width="600" height="37"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="30"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="highlightedColor" red="0.0" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="shadowColor" red="0.60936754420000006" green="0.93311543370000005" blue="0.50457952029999997" alpha="1" colorSpace="calibratedRGB"/>
+                                <size key="shadowOffset" width="2" height="2"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Only 3 Characters Allow" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QZ0-w5-tJi" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
+                                <rect key="frame" x="148" y="65" width="436" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <textInputTraits key="textInputTraits" keyboardType="namePhonePad"/>
+                            </textField>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="UlW-na-iiL" secondAttribute="trailing" constant="15" id="9Qo-25-8UW"/>
+                            <constraint firstAttribute="trailing" secondItem="kkO-3n-f9g" secondAttribute="trailing" id="FDe-Ew-RTQ"/>
+                            <constraint firstItem="uEw-74-KTV" firstAttribute="leading" secondItem="tr2-91-TEw" secondAttribute="leading" id="Ff2-sy-87r"/>
+                            <constraint firstItem="uEw-74-KTV" firstAttribute="centerY" secondItem="QZ0-w5-tJi" secondAttribute="centerY" id="Flp-CP-067"/>
+                            <constraint firstItem="uEw-74-KTV" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="15" id="Kwg-Q9-ieL"/>
+                            <constraint firstItem="QZ0-w5-tJi" firstAttribute="leading" secondItem="uEw-74-KTV" secondAttribute="trailing" constant="15" id="Uci-dl-gt7"/>
+                            <constraint firstItem="UlW-na-iiL" firstAttribute="leading" secondItem="tr2-91-TEw" secondAttribute="trailing" constant="15" id="ZoC-fn-xXA"/>
+                            <constraint firstItem="QZ0-w5-tJi" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="dNa-FQ-yQX"/>
+                            <constraint firstItem="uEw-74-KTV" firstAttribute="top" secondItem="kkO-3n-f9g" secondAttribute="bottom" constant="8" id="f84-5q-JN4"/>
+                            <constraint firstItem="tr2-91-TEw" firstAttribute="centerY" secondItem="UlW-na-iiL" secondAttribute="centerY" id="goY-j3-PeX"/>
+                            <constraint firstItem="kkO-3n-f9g" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="i6e-l1-6Vz"/>
+                            <constraint firstItem="tr2-91-TEw" firstAttribute="top" secondItem="uEw-74-KTV" secondAttribute="bottom" constant="10" id="tqP-Qu-Pxp"/>
+                            <constraint firstItem="kkO-3n-f9g" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="uiE-hc-Jgu"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="textField1" destination="QZ0-w5-tJi" id="Kaj-jl-jnc"/>
+                        <outlet property="textField2" destination="UlW-na-iiL" id="cWq-sw-283"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>
