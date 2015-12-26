@@ -18,7 +18,8 @@ class TextFieldValidationVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        textField1.setValidation(3, maxTextLimit: 5, keyboardType: UIKeyboardType.Default)
+        textField1.setValidation(3, maxTextLimit: 5, keyboardType: UIKeyboardType.EmailAddress)
+        textField2.setValidation(5, maxTextLimit: 10, keyboardType: UIKeyboardType.Default)
         
     }
 

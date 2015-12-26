@@ -9,10 +9,12 @@
 import UIKit
 
 class ITextField: UITextField, UITextFieldDelegate {
-
+    
     let isLog = true
     let className = "ITextField"
     var isHeightInitialized = false
+    let placeholderColor = UIColor(red: 199.0/255, green: 199.0/255, blue: 205.0/255, alpha: 1.0)
+    let padding = UIEdgeInsets(top: 0, left: 10, bottom: 3, right: 10);
     
     // validation settings
     var watchValidation = false
@@ -26,40 +28,115 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     var inValidMsg: String?
     var showInvalidMsgAfterFocusOut = false // by default (show msg on text change)
-
-    // private properties
-    var _validationView: UIView!
-    var _validationViewHeight: CGFloat = 10.0 // by default
-    var _validationLabel: UILabel!
     
+    // private properties
+    let isAnimateValidationMsg = false
+    
+    var _title: UILabel!
+    let _titleColor = UIColor(red: 101.0/255.0, green: 178.0/255.0, blue: 137.0/255.0, alpha: 1.0)
+    var _isTitleVisible = false
+    
+    var _validationView: UIView!
+    var _validationViewHeight: CGFloat = 30.0 // by default
+    var _validationLabel: UILabel!
+    var _validationLabelFontSize: CGFloat = 10.0
+    
+    
+    // MARK: TextField Lines Properties
+    var lineColor = UIColor(red: 174.0/255, green: 174.0/255, blue: 175.0/255, alpha: 1.0)
+    let validLineColor = UIColor(red: 174.0/255, green: 174.0/255, blue: 175.0/255, alpha: 1.0)
+    let inValidLineColor = UIColor.redColor()
+    let leftLineWidth: CGFloat = 0.5
+    let leftLineHeight: CGFloat = 5.0
+    var leftLineColor = UIColor.lightGrayColor()
+    let leftLinePadding: CGFloat = 0.5
+    
+    let bottomLineHeight: CGFloat = 0.5
+    var bottomLineColor = UIColor.lightGrayColor()
+    let bottomLinePadding: CGFloat = 0.5
+    
+    let rightLineWidth: CGFloat = 0.5
+    let rightLineHeight: CGFloat = 5.0
+    var rightLineColor = UIColor.lightGrayColor()
+    let rightLinePadding: CGFloat = 0.5
+    
+    let bottomLine = CALayer()
+    let leftLine = CALayer()
+    let rightLine = CALayer()
     
     
     // initialize
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         iLog("\(className), \(__FUNCTION__)")
         self.delegate = self
         self.addTarget(self, action: "textFieldDidChange:", forControlEvents: UIControlEvents.EditingChanged)
-
-        let
-        _validationViewHeight = (self.frame.height / 100) * 10
         
+        
+        //self.backgroundColor = UIColor.lightGrayColor()
         
     }
-
+    
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        
+        setupLines()
+        
+    }
+    
+    
     override func layoutSubviews() {
         super.layoutSubviews()
-//        if !isHeightInitialized {
-//            isHeightInitialized = true
-//        self.frame.size.height += 10
-//        }
+        
+        updateLines()
+        
+        updateTitleFrame()
+        
+        updateValidationViewFrame()
+        
     }
+    
+    
+    // MARK: TextField Lines func's
+    func setupLines(){
+        //   lines color
+        leftLineColor = lineColor
+        bottomLineColor = lineColor
+        rightLineColor = lineColor
+        
+        // remove border
+        self.borderStyle = UITextBorderStyle.None
+        
+        changeLinesColor(lineColor)
+        
+        // make lines
+        self.updateLines()
+        
+        // add lines to view
+        self.superview!.layer.addSublayer(bottomLine)
+        self.superview!.layer.addSublayer(leftLine)
+        self.superview!.layer.addSublayer(rightLine)
+    }
+    
+    func updateLines(){
+        
+        let bottomLineY = self.frame.maxY + self.padding.bottom
+        
+        bottomLine.frame = CGRectMake(self.frame.origin.x - (self.padding.left), bottomLineY, self.frame.width + (self.padding.left + self.padding.right), bottomLineHeight)
+        
+        leftLine.frame = CGRectMake(bottomLine.frame.origin.x, bottomLine.frame.origin.y-(leftLineHeight), leftLineWidth, leftLineHeight)
+        
+        rightLine.frame = CGRectMake(bottomLine.frame.maxX-(rightLineWidth), bottomLine.frame.origin.y-(rightLineHeight), rightLineWidth, rightLineHeight)
+        
+    }
+    
+    
     // got focus
     func textFieldDidBeginEditing(textField: UITextField) {
         iLog("\(className), \(__FUNCTION__)")
         
         if _validationView == nil { // if already not added
-        addValidationView()
+            addValidationView()
         }
         
     }
@@ -70,10 +147,20 @@ class ITextField: UITextField, UITextFieldDelegate {
         
         _checkMinTextLimit()
         
+        if textField.text?.characters.count > 0{
+            dispatch_async(dispatch_get_main_queue(),{
+                self.addTitleLabel()
+            })
+        }else if textField.text?.characters.count < 1{
+            dispatch_async(dispatch_get_main_queue(),{
+                self.removeTitleLabel()
+            })
+        }
+        
     }
     
     
-
+    
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -84,19 +171,21 @@ class ITextField: UITextField, UITextFieldDelegate {
     func _checkMinTextLimit(){
         iLog("\(className), \(__FUNCTION__)")
         if let minLimit = self.minTextLimit { // min limit set
-                
-                //iLog("textLength: \(self.text.textLength())")
             
-                if self.text.textLength() < minLimit{ // text length is less
-                    _showValidationMsg("Minimum \(minLimit) Characters Required.")
-                    self.isValidated = false
-                }else{ // text length is correct according to user limit
-                    iLog("\(className), \(__FUNCTION__), Validated.")
-                    self.isValidated = true
-                    _checkMaxTextLimit()
-                }
-                
-                
+            //iLog("textLength: \(self.text.textLength())")
+            
+            if self.text!.textLength() < minLimit{ // text length is less
+                _showValidationMsg("Minimum \(minLimit) Characters Required.")
+                changeLinesColor(inValidLineColor)
+                self.isValidated = false
+            }else{ // text length is correct according to user limit
+                iLog("\(className), \(__FUNCTION__), Validated.")
+                changeLinesColor(validLineColor)
+                self.isValidated = true
+                _checkMaxTextLimit()
+            }
+            
+            
             
         }
     }
@@ -104,16 +193,18 @@ class ITextField: UITextField, UITextFieldDelegate {
     func _checkMaxTextLimit(){
         iLog("\(className), \(__FUNCTION__)")
         if let maxLimit = self.maxTextLimit { // max limit set
-            if !self.text.isEmpty { // textfield not empty
+            if !self.text!.isEmpty { // textfield not empty
                 if self.isValidated == true { // min text limit is validated so check maxlimit
                     
                     //iLog("textLength: \(self.text.textLength())")
                     
-                    if self.text.textLength() > maxLimit{ // text length is less
+                    if self.text!.textLength() > maxLimit{ // text length is less
                         _showValidationMsg("Maximum \(maxLimit) Characters Required.")
+                        changeLinesColor(inValidLineColor)
                         self.isValidated = false
                     }else{ // text length is correct according to user limit
                         iLog("\(className), \(__FUNCTION__), Validated.")
+                        changeLinesColor(validLineColor)
                         _hideValidationMsg()
                         self.isValidated = true
                     }
@@ -128,7 +219,9 @@ class ITextField: UITextField, UITextFieldDelegate {
     // release focus
     func textFieldDidEndEditing(textField: UITextField) {
         iLog("\(className), \(__FUNCTION__)")
-
+        
+        removeTitleLabel()
+        
         removeValidationView()
     }
     
@@ -168,31 +261,97 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     // helper func's
     
+    func addTitleLabel(){
+        iLog("\(className), \(__FUNCTION__)")
+        
+        if _isTitleVisible == false{
+            _isTitleVisible = true
+            self._title = UILabel(frame: self.frame)
+            self._title.textColor = self.placeholderColor
+            //self._title.backgroundColor = UIColor.grayColor()
+            self._title.font = self.font
+            self._title.adjustsFontSizeToFitWidth = true
+            self._title.minimumScaleFactor = 0.50
+            self._title.textAlignment = NSTextAlignment.Left
+            
+            if self.placeholder != nil{
+                self._title.text = self.placeholder!
+            }
+            
+            self.superview?.addSubview(self._title)
+            
+            UIView.animateWithDuration(0.3) { () -> Void in
+                
+                self._title.frame.origin.y -= self.frame.size.height
+                self._title.frame.size.width -= self.frame.size.width/2
+                self._title.textColor = self._titleColor
+                
+                self._title.font = UIFont(name: self.font!.fontName, size: self.font!.pointSize - (self.font!.pointSize/3) )
+                
+            }
+            
+        }
+        
+        
+    }
+    
+    func updateTitleFrame(){
+        if self._isTitleVisible {
+            self._title.frame = CGRect(x: self.frame.origin.x, y: self.frame.origin.y - (self.frame.size.height), width: self.frame.size.width/2, height: self.frame.size.height)
+        }
+    }
+    
+    func removeTitleLabel(){
+        iLog("\(className), \(__FUNCTION__)")
+        
+        if _isTitleVisible == true && self.text?.textLength() < 1{
+            self._title.removeFromSuperview()
+            self._title = nil
+            self._isTitleVisible = false
+        }
+        
+    }
+    
+    
+    
+    
     func addValidationView(){
         iLog("\(className), \(__FUNCTION__)")
         
         if _validationView == nil {
             dispatch_async(dispatch_get_main_queue(),{
                 
-            self._validationView = UIView(frame: CGRect(x: self.frame.origin.x, y: self.frame.origin.y-self._validationViewHeight+5, width: self.frame.width, height: self._validationViewHeight))
-            self.superview?.addSubview(self._validationView)
-            
-            self._validationLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self._validationView.frame.width, height: self._validationView.frame.height))
-            self._validationLabel.textColor = UIColor.orangeColor()
-            self._validationLabel.font = UIFont(name: self._validationLabel.font.fontName, size: 6)
-            self._validationLabel.textAlignment = NSTextAlignment.Right
-            self._validationView.addSubview(self._validationLabel)
-            
-            self._checkMinTextLimit()
+                self._validationView = UIView(frame: CGRect(x: self.frame.origin.x + (self.frame.width/2), y: self.frame.origin.y-( self.frame.size.height-(self.frame.size.height/3) ), width: self.frame.width/2, height: self.frame.size.height-(self.frame.size.height/3) ))
+                self._validationView.frame.origin.y = self.frame.origin.y-(self._validationView.frame.height)
+                //self._validationView.backgroundColor = UIColor.brownColor()
+                self.superview?.addSubview(self._validationView)
+                
+                self._validationLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self._validationView.frame.width, height: self._validationView.frame.height))
+                self._validationLabel.textColor = UIColor.orangeColor()
+                self._validationLabel.font = UIFont(name: self._validationLabel.font.fontName, size: self.font!.pointSize-(self.font!.pointSize/4))
+                self._validationLabel.adjustsFontSizeToFitWidth = true
+                self._validationLabel.minimumScaleFactor = 0.50
+                self._validationLabel.textAlignment = NSTextAlignment.Right
+                self._validationView.addSubview(self._validationLabel)
+                
+                self._checkMinTextLimit()
                 
             })
         }
         
     }
     
+    func updateValidationViewFrame(){
+        if self._validationView != nil {
+            self._validationView.frame = CGRect(x: self.frame.origin.x + (self.frame.width/2), y: self.frame.origin.y-( self.frame.size.height-(self.frame.size.height/3) ), width: self.frame.width/2, height: self.frame.size.height-(self.frame.size.height/3) )
+            self._validationLabel.frame = CGRect(x: 0, y: 0, width: self._validationView.frame.width, height: self._validationView.frame.height)
+        }
+    }
+    
     func _showValidationMsg(msg: String){
         iLog("\(className), \(__FUNCTION__), msg: \(msg)")
         dispatch_async(dispatch_get_main_queue(),{
+            self.updateValidationViewFrame()
             self._validationLabel.text = msg
             self._validationView.hidden = false
             self.animateText(self._validationLabel)
@@ -200,21 +359,38 @@ class ITextField: UITextField, UITextFieldDelegate {
     }
     
     func animateText(label: UILabel){
-        UIView.animateWithDuration(0.1, animations: { () -> Void in
+        
+        if !isAnimateValidationMsg {return}
+        
+        UIView.animateWithDuration(0.2, animations: { () -> Void in
             
             label.alpha = 0.6
             
+            self.leftLine.opacity = 0.3
+            self.bottomLine.opacity = 0.3
+            self.rightLine.opacity = 0.3
+            
             }, completion: { (bool) -> Void in
                 
-                UIView.animateWithDuration(0.2, animations: { () -> Void in
+                UIView.animateWithDuration(0.5, animations: { () -> Void in
                     
                     label.alpha = 1.0
+                    
+                    self.leftLine.opacity = 1.0
+                    self.bottomLine.opacity = 1.0
+                    self.rightLine.opacity = 1.0
                     
                     }, completion: nil)
                 
         })
     }
-
+    
+    func changeLinesColor(color: UIColor){
+        leftLine.backgroundColor = color.CGColor
+        bottomLine.backgroundColor = color.CGColor
+        rightLine.backgroundColor = color.CGColor
+    }
+    
     func _hideValidationMsg(){
         iLog("\(className), \(__FUNCTION__)")
         dispatch_async(dispatch_get_main_queue(),{
@@ -237,13 +413,22 @@ class ITextField: UITextField, UITextFieldDelegate {
         
     }
     
+    private func newBounds(bounds: CGRect) -> CGRect {
+        var newBounds = bounds
+        newBounds.origin.x += padding.left
+        newBounds.origin.y += padding.top
+        newBounds.size.height -= padding.top + padding.bottom
+        newBounds.size.width -= padding.left + padding.right
+        return newBounds
+    }
+    
     func iLog(data: AnyObject?){
         if isLog && data != nil{
             dispatch_async(dispatch_get_main_queue(),{
                 
                 // For Swift 1.2
-                println("\(data!)")
-                println("") // for new line after each log
+                print("\(data!)")
+                print("") // for new line after each log
                 
                 /*
                 // For Swift 2.1 or later
@@ -255,7 +440,7 @@ class ITextField: UITextField, UITextFieldDelegate {
         }
     }
     
-
+    
 }
 
 // text types
@@ -268,7 +453,7 @@ enum ITextFieldTextTypes {
 
 extension String{
     func textLength()->Int{
-        let textLength = countElements(self)
+        let textLength = self.characters.count
         return textLength
     }
 }
