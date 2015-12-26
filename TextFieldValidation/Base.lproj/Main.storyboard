@@ -30,7 +30,7 @@
                                 <size key="shadowOffset" width="2" height="2"/>
                             </label>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Only 3 Characters Allow" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QZ0-w5-tJi" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
-                                <rect key="frame" x="25" y="85" width="550" height="17"/>
+                                <rect key="frame" x="10" y="85" width="580" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="namePhonePad"/>
                             </textField>
@@ -40,10 +40,10 @@
                             <constraint firstAttribute="trailing" secondItem="UlW-na-iiL" secondAttribute="trailing" constant="25" id="9Qo-25-8UW"/>
                             <constraint firstItem="UlW-na-iiL" firstAttribute="top" secondItem="QZ0-w5-tJi" secondAttribute="bottom" constant="25" id="Aqt-Ao-QkK"/>
                             <constraint firstAttribute="trailing" secondItem="kkO-3n-f9g" secondAttribute="trailing" id="FDe-Ew-RTQ"/>
-                            <constraint firstItem="QZ0-w5-tJi" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="25" id="RI1-Rw-zHq"/>
+                            <constraint firstItem="QZ0-w5-tJi" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="10" id="RI1-Rw-zHq"/>
                             <constraint firstItem="UlW-na-iiL" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="25" id="TVh-K4-VsG"/>
                             <constraint firstItem="QZ0-w5-tJi" firstAttribute="top" secondItem="kkO-3n-f9g" secondAttribute="bottom" constant="30" id="UAS-L6-goQ"/>
-                            <constraint firstAttribute="trailing" secondItem="QZ0-w5-tJi" secondAttribute="trailing" constant="25" id="h3s-ju-K9Y"/>
+                            <constraint firstAttribute="trailing" secondItem="QZ0-w5-tJi" secondAttribute="trailing" constant="10" id="h3s-ju-K9Y"/>
                             <constraint firstItem="kkO-3n-f9g" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="i6e-l1-6Vz"/>
                             <constraint firstItem="kkO-3n-f9g" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="uiE-hc-Jgu"/>
                         </constraints>

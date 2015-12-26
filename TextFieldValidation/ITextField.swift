@@ -19,7 +19,6 @@ class ITextField: UITextField, UITextFieldDelegate {
     // validation settings
     var watchValidation = false
     var isValidated = false
-    var textType: ITextFieldTextTypes?
     var minTextLimit: Int?
     var minTextLimitValidated = false
     
@@ -84,7 +83,6 @@ class ITextField: UITextField, UITextFieldDelegate {
         
     }
     
-    
     override func layoutSubviews() {
         super.layoutSubviews()
         
@@ -96,6 +94,13 @@ class ITextField: UITextField, UITextFieldDelegate {
         
     }
     
+    override func textRectForBounds(bounds: CGRect) -> CGRect {
+        return newBounds(bounds)
+    }
+    
+    override func editingRectForBounds(bounds: CGRect) -> CGRect {
+        return newBounds(bounds)
+    }
     
     // MARK: TextField Lines func's
     func setupLines(){
@@ -120,14 +125,14 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     func updateLines(){
         
-        let bottomLineY = self.frame.maxY + self.padding.bottom
+        let bottomLineY = self.frame.maxY
         
-        bottomLine.frame = CGRectMake(self.frame.origin.x - (self.padding.left), bottomLineY, self.frame.width + (self.padding.left + self.padding.right), bottomLineHeight)
+        bottomLine.frame = CGRectMake(self.frame.origin.x, bottomLineY, self.frame.width, bottomLineHeight)
         
         leftLine.frame = CGRectMake(bottomLine.frame.origin.x, bottomLine.frame.origin.y-(leftLineHeight), leftLineWidth, leftLineHeight)
         
         rightLine.frame = CGRectMake(bottomLine.frame.maxX-(rightLineWidth), bottomLine.frame.origin.y-(rightLineHeight), rightLineWidth, rightLineHeight)
-        
+ 
     }
     
     
@@ -175,7 +180,7 @@ class ITextField: UITextField, UITextFieldDelegate {
             //iLog("textLength: \(self.text.textLength())")
             
             if self.text!.textLength() < minLimit{ // text length is less
-                _showValidationMsg("Minimum \(minLimit) Characters Required.")
+                _showValidationMsg("Min \(minLimit) Characters.")
                 changeLinesColor(inValidLineColor)
                 self.isValidated = false
             }else{ // text length is correct according to user limit
@@ -199,7 +204,7 @@ class ITextField: UITextField, UITextFieldDelegate {
                     //iLog("textLength: \(self.text.textLength())")
                     
                     if self.text!.textLength() > maxLimit{ // text length is less
-                        _showValidationMsg("Maximum \(maxLimit) Characters Required.")
+                        _showValidationMsg("Max \(maxLimit) Characters.")
                         changeLinesColor(inValidLineColor)
                         self.isValidated = false
                     }else{ // text length is correct according to user limit
@@ -252,7 +257,6 @@ class ITextField: UITextField, UITextFieldDelegate {
         watchValidation = false
         self.minTextLimit = nil
         self.maxTextLimit = nil
-        self.textType = nil
     }
     
     
@@ -305,9 +309,11 @@ class ITextField: UITextField, UITextFieldDelegate {
         iLog("\(className), \(__FUNCTION__)")
         
         if _isTitleVisible == true && self.text?.textLength() < 1{
+            
             self._title.removeFromSuperview()
             self._title = nil
             self._isTitleVisible = false
+            
         }
         
     }
@@ -414,6 +420,7 @@ class ITextField: UITextField, UITextFieldDelegate {
     }
     
     private func newBounds(bounds: CGRect) -> CGRect {
+        //iLog("\(className), \(__FUNCTION__)")
         var newBounds = bounds
         newBounds.origin.x += padding.left
         newBounds.origin.y += padding.top
@@ -443,13 +450,6 @@ class ITextField: UITextField, UITextFieldDelegate {
     
 }
 
-// text types
-enum ITextFieldTextTypes {
-    case All
-    case Numeric
-    case Alphabets
-    case Alphanumeric
-}
 
 extension String{
     func textLength()->Int{
