@@ -11,6 +11,21 @@ import UIKit
 class ITextField: UITextField, UITextFieldDelegate {
     
     let isLog = true
+    var isRequired = false
+    var isValid: Bool {
+        if isRequired { // when required so first validate then return its validated or not
+            validate()
+            if !isValidated {
+                self.becomeFirstResponder()
+            }
+            return isValidated
+        }else{
+            if isValidated == false{
+                return isValidated
+            }
+        }
+        return true // optional
+    }
     let className = "ITextField"
     var isHeightInitialized = false
     let placeholderColor = UIColor(red: 199.0/255, green: 199.0/255, blue: 205.0/255, alpha: 1.0)
@@ -18,12 +33,14 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     // validation settings
     var watchValidation = false
-    var isValidated = false
+    var isValidated = true
     var minTextLimit: Int?
     var minTextLimitValidated = false
     
     var maxTextLimit: Int?
     var maxTextLimitValidated = false
+    
+    var emailAddressValidated = false
     
     var inValidMsg: String?
     var showInvalidMsgAfterFocusOut = false // by default (show msg on text change)
@@ -70,6 +87,8 @@ class ITextField: UITextField, UITextFieldDelegate {
         iLog("\(className), \(__FUNCTION__)")
         self.delegate = self
         self.addTarget(self, action: "textFieldDidChange:", forControlEvents: UIControlEvents.EditingChanged)
+        // editing pointer color
+        self.tintColor = self._titleColor
         
         
         //self.backgroundColor = UIColor.lightGrayColor()
@@ -140,8 +159,58 @@ class ITextField: UITextField, UITextFieldDelegate {
     func textFieldDidBeginEditing(textField: UITextField) {
         iLog("\(className), \(__FUNCTION__)")
         
-        if _validationView == nil { // if already not added
-            addValidationView()
+        validate()
+        
+    }
+    
+    func validate(){
+        
+        dispatch_async(dispatch_get_main_queue(),{
+            if self._validationView == nil { // if already not added
+                self.addValidationView()
+            }
+            
+            self.validateEmailIfNeeded()
+            self._checkMinTextLimit()
+            self._checkMaxTextLimit()
+            self.manageTitle()
+        })
+        
+    }
+    
+    func validateEmailIfNeeded(){
+        
+        if self.keyboardType == .EmailAddress {
+            if text!.isEmail == false {
+                
+                _showValidationMsg("Invalid Email Address")
+                changeLinesColor(inValidLineColor)
+                self.emailAddressValidated = false
+                self.isValidated = false
+                
+            }else{
+                
+                iLog("\(className), \(__FUNCTION__), Email Address Validated.")
+                changeLinesColor(validLineColor)
+                _hideValidationMsg()
+                self.emailAddressValidated = true
+                self.isValidated = true
+                
+            }
+        }
+        
+    }
+    
+    func manageTitle(){
+        
+        if text?.characters.count > 0{
+            dispatch_async(dispatch_get_main_queue(),{
+                self.addTitleLabel()
+            })
+        }else if text?.characters.count < 1{
+            dispatch_async(dispatch_get_main_queue(),{
+                self.removeTitleLabelIfNeeded()
+            })
         }
         
     }
@@ -150,18 +219,10 @@ class ITextField: UITextField, UITextFieldDelegate {
     func textFieldDidChange(textField: UITextField){
         iLog("\(className), \(__FUNCTION__), newText: \(textField.text)")
         
-        _checkMinTextLimit()
-        
-        if textField.text?.characters.count > 0{
-            dispatch_async(dispatch_get_main_queue(),{
-                self.addTitleLabel()
-            })
-        }else if textField.text?.characters.count < 1{
-            dispatch_async(dispatch_get_main_queue(),{
-                self.removeTitleLabel()
-            })
-        }
-        
+        validate()
+
+        manageTitle()
+
     }
     
     
@@ -175,19 +236,19 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     func _checkMinTextLimit(){
         iLog("\(className), \(__FUNCTION__)")
+        if self.keyboardType == .EmailAddress && !emailAddressValidated {return}
         if let minLimit = self.minTextLimit { // min limit set
             
             //iLog("textLength: \(self.text.textLength())")
             
             if self.text!.textLength() < minLimit{ // text length is less
-                _showValidationMsg("Min \(minLimit) Characters.")
+                _showValidationMsg("Min \(minLimit) Characters")
                 changeLinesColor(inValidLineColor)
                 self.isValidated = false
             }else{ // text length is correct according to user limit
                 iLog("\(className), \(__FUNCTION__), Validated.")
                 changeLinesColor(validLineColor)
                 self.isValidated = true
-                _checkMaxTextLimit()
             }
             
             
@@ -197,6 +258,7 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     func _checkMaxTextLimit(){
         iLog("\(className), \(__FUNCTION__)")
+        if self.keyboardType == .EmailAddress && !emailAddressValidated {return}
         if let maxLimit = self.maxTextLimit { // max limit set
             if !self.text!.isEmpty { // textfield not empty
                 if self.isValidated == true { // min text limit is validated so check maxlimit
@@ -204,7 +266,7 @@ class ITextField: UITextField, UITextFieldDelegate {
                     //iLog("textLength: \(self.text.textLength())")
                     
                     if self.text!.textLength() > maxLimit{ // text length is less
-                        _showValidationMsg("Max \(maxLimit) Characters.")
+                        _showValidationMsg("Max \(maxLimit) Characters")
                         changeLinesColor(inValidLineColor)
                         self.isValidated = false
                     }else{ // text length is correct according to user limit
@@ -225,9 +287,16 @@ class ITextField: UITextField, UITextFieldDelegate {
     func textFieldDidEndEditing(textField: UITextField) {
         iLog("\(className), \(__FUNCTION__)")
         
-        removeTitleLabel()
+        validateEmailIfNeeded()
         
-        removeValidationView()
+        validate()
+        
+        self.resignFirstResponder()
+        
+        removeTitleLabelIfNeeded()
+        
+        removeValidationViewIfNeeded()
+        
     }
     
     
@@ -249,6 +318,15 @@ class ITextField: UITextField, UITextFieldDelegate {
         self.maxTextLimit = maxTextLimit
         self.keyboardType = keyboardType
         
+    }
+    func setValidation(minTextLimit: Int, maxTextLimit: Int, keyboardType: UIKeyboardType, isRequired: Bool){
+        iLog("\(className), \(__FUNCTION__), minLimit: \(minTextLimit), maxLimit: \(maxTextLimit), keyboardType.hashValue: \(keyboardType.hashValue)")
+        
+        watchValidation = true
+        self.minTextLimit = minTextLimit
+        self.maxTextLimit = maxTextLimit
+        self.keyboardType = keyboardType
+        self.isRequired = isRequired
     }
     
     func removeValidation(){
@@ -305,7 +383,7 @@ class ITextField: UITextField, UITextFieldDelegate {
         }
     }
     
-    func removeTitleLabel(){
+    func removeTitleLabelIfNeeded(){
         iLog("\(className), \(__FUNCTION__)")
         
         if _isTitleVisible == true && self.text?.textLength() < 1{
@@ -340,8 +418,6 @@ class ITextField: UITextField, UITextFieldDelegate {
                 self._validationLabel.textAlignment = NSTextAlignment.Right
                 self._validationView.addSubview(self._validationLabel)
                 
-                self._checkMinTextLimit()
-                
             })
         }
         
@@ -358,9 +434,11 @@ class ITextField: UITextField, UITextFieldDelegate {
         iLog("\(className), \(__FUNCTION__), msg: \(msg)")
         dispatch_async(dispatch_get_main_queue(),{
             self.updateValidationViewFrame()
+            if self._validationView != nil {
             self._validationLabel.text = msg
             self._validationView.hidden = false
             self.animateText(self._validationLabel)
+            }
         })
     }
     
@@ -400,13 +478,14 @@ class ITextField: UITextField, UITextFieldDelegate {
     func _hideValidationMsg(){
         iLog("\(className), \(__FUNCTION__)")
         dispatch_async(dispatch_get_main_queue(),{
+            if self._validationView != nil {
             self._validationLabel.text = ""
             self._validationView.hidden = true
-            
+            }
         })
     }
     
-    func removeValidationView(){
+    func removeValidationViewIfNeeded(){
         iLog("\(className), \(__FUNCTION__)")
         
         if isValidated {
@@ -452,9 +531,18 @@ class ITextField: UITextField, UITextFieldDelegate {
 
 
 extension String{
+    
     func textLength()->Int{
         let textLength = self.characters.count
         return textLength
     }
+    
+    var isEmail: Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}"
+        let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        let result = emailTest.evaluateWithObject(self)
+        return result
+    }
+    
 }
 
