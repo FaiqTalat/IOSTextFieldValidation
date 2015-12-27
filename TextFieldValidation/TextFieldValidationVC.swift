@@ -39,7 +39,7 @@ class TextFieldValidationVC: UIViewController {
     
     func _validateAllFields(){
         if textField1.isValid && textField2.isValid && textField3.isValid && textField4.isValid && textField5.isValid {
-            print("All Fields Validated.")
+            print("All Fields Validated.\n")
         }
     }
 

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>8792ECF1-6DA9-4F0B-BC64-7CB62C3589FD</string>
+	<key>IDESourceControlProjectName</key>
+	<string>TextFieldValidation</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>B7FF1AFFB3521CC19D04A6B39AFBF269864DE032</key>
+		<string>https://github.com/FaiqTalat/IOSTextFieldValidation.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>TextFieldValidation.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>B7FF1AFFB3521CC19D04A6B39AFBF269864DE032</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/FaiqTalat/IOSTextFieldValidation.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>B7FF1AFFB3521CC19D04A6B39AFBF269864DE032</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>B7FF1AFFB3521CC19D04A6B39AFBF269864DE032</string>
+			<key>IDESourceControlWCCName</key>
+			<string>TextFieldValidation</string>
+		</dict>
+	</array>
+</dict>
+</plist>
