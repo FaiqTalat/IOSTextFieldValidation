@@ -277,6 +277,7 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        validateAllTextFields()
         return true
     }
     
@@ -393,6 +394,49 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     
     // helper func's
+    
+    func validateAllTextFields(){
+        if let _superview = self.superview {
+            var allITextfields = [ITextField]()
+            for _subview in _superview.subviews {
+                if let _iTextField = _subview as? ITextField {
+                    iLog("\(className), \(__FUNCTION__), _iTextField.placeholder: \(_iTextField.placeholder)")
+
+                    allITextfields.append(_iTextField)
+                    
+                }
+            }
+
+            getTextFieldsWithPriority(allITextfields)
+            
+        }
+    }
+    
+    func getTextFieldsWithPriority(textfields: [ITextField])->[ITextField]{
+        
+        var _allTFWithXY = [CGFloat: ITextField]()
+        var _allTFWithPriority = [ITextField]()
+        
+        // ascending all tf with respect to Y
+        for _iTextField in textfields{
+            let _iTextField_XPlusY = _iTextField.frame.origin.x + _iTextField.frame.origin.y
+            _allTFWithXY[_iTextField_XPlusY] = _iTextField
+        }
+        
+        let allTFSortedByXY = _allTFWithXY.keys.array.sorted { (first, second) -> Bool in
+            return first < second
+        }
+        iLog("allTFSortedByXY: \(allTFSortedByXY)")
+        
+        for _iTextFieldY in allTFSortedByXY{
+            if let _iTextField = _allTFWithXY[_iTextFieldY]{
+                iLog("Sorted By X & Y _iTextField.placeholder: \(_iTextField.placeholder)")
+                _allTFWithPriority.append(_iTextField)
+            }
+        }
+        
+        return _allTFWithPriority
+    }
     
     func addTitleLabel(){
         

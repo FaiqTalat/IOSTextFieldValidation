@@ -26,6 +26,9 @@ class TextFieldValidationVC: UIViewController {
         textField4.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
         textField5.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
         
+        
+        textField1.validateAllTextFields()
+        
     }
 
     override func didReceiveMemoryWarning() {
