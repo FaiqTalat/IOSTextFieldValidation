@@ -256,13 +256,20 @@ class ITextField: UITextField, UITextFieldDelegate {
     // text did change
     func textFieldDidChange(textField: UITextField){
         iLog("\(className), \(__FUNCTION__), newText: \(textField.text)")
+        manageTitle()
+
+        if !isRequired && text.textLength() < 1 { // optional field and nothing is written in text so valid it without validate.
+            isValidated = true
+            removeValidationViewIfNeeded()
+            removeTitleLabelIfNeeded()
+            changeLinesColor(lineColor)
+            iLog("\(className), \(__FUNCTION__), Optional Field isValidated: \(isValidated).")
+            return
+        }
         
         isValidated = false
         lastValidationCheckedStatus = false
-        
         validate()
-        
-        manageTitle()
         
     }
     
