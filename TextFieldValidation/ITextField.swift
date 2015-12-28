@@ -114,9 +114,7 @@ class ITextField: UITextField, UITextFieldDelegate {
         self.tintColor = self._titleColor
         
         self.returnKeyType = .Done
-        
-        
-        
+ 
         //self.backgroundColor = UIColor.lightGrayColor()
         
     }
@@ -130,6 +128,7 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        //iLog("\(className), \(__FUNCTION__), \(self.placeholder)")
         
         updateLines()
         
@@ -658,10 +657,10 @@ extension String{
 extension UIView {
 
     // validation method for all textfield with first in first out priority in view
-    func validateAllTextFields(){
+    func validateAllTextFields()->Bool{
         
         // get all tf in view with first in first out priority
-        func _getTextFieldsWithPriorityAndCheckIsValid(textfields: [ITextField]){
+        func _getTextFieldsWithPriorityAndCheckIsValid(textfields: [ITextField])->Bool{
             
             var _allTFWithY = [CGFloat: ITextField]()
             
@@ -676,11 +675,12 @@ extension UIView {
             for _iTextFieldY in allTFSortedByY{
                 if let _iTextField = _allTFWithY[_iTextFieldY]{
                     if !_iTextField.isValid { // is one TF is invalid so no try another tf
-                        return
+                        return false
                     }
                 }
             }
             
+            return true
         }
         
         // get all tf in view
@@ -691,10 +691,8 @@ extension UIView {
                 }
             }
             
-            _getTextFieldsWithPriorityAndCheckIsValid(allITextfields)
-            
-        
-        
+           return _getTextFieldsWithPriorityAndCheckIsValid(allITextfields)
+           
     }
     
     // hide keyboard when tap on outside the textfield
@@ -703,5 +701,190 @@ extension UIView {
             self.endEditing(true)
     }
     
+    func getFirstResponder()->ITextField?{
+        
+        for _subview in self.subviews {
+            if _subview.isFirstResponder() {
+                if let _iTextField = _subview as? ITextField {
+                    return _iTextField
+                }
+            }
+        }
+        
+        return nil
+    }
+    
 }
+
+// extend all uiviewcontroller classes from LoginUserDelegate add self in delegates
+extension UIViewController {
+    
+    public override static func initialize() {
+        
+        struct Static {
+            static var token: dispatch_once_t = 0
+        }
+        
+        // make sure this isn't a subclass
+        if self !== UIViewController.self {
+            return
+        }
+        
+        dispatch_once(&Static.token) {
+            
+            let originalSelectorVDL = Selector("viewDidLoad")
+            let swizzledSelectorVDL = Selector("_viewDidLoad")
+            
+            let originalMethod = class_getInstanceMethod(self, originalSelectorVDL)
+            let swizzledMethod = class_getInstanceMethod(self, swizzledSelectorVDL)
+            
+            let didAddMethod = class_addMethod(self, originalSelectorVDL, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+            
+            if didAddMethod {
+                class_replaceMethod(self, swizzledSelectorVDL, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod))
+            } else {
+                method_exchangeImplementations(originalMethod, swizzledMethod);
+            }
+            
+        }
+        
+    }
+    
+    // MARK: - Method Swizzling
+    
+    func _viewDidLoad() {
+        
+        // custom did load functions
+        
+        //print("\(__FUNCTION__): \(self.dynamicType)")
+        
+        listenerOnKeyboardAppearORDisappear()
+        
+    }
+    
+    // helper methods
+    func listenerOnKeyboardAppearORDisappear(){
+        NSNotificationCenter.defaultCenter().addObserver(self, selector:"moveViewAccordingToActiveTextfield:", name: UIKeyboardWillShowNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector:"moveViewAccordingToActiveTextfield:", name: UIKeyboardWillHideNotification, object: nil)
+    }
+
+    func moveViewAccordingToActiveTextfield(notification: NSNotification) {
+        
+        if let userInfo = notification.userInfo {
+            let keyboardSizeNSValue = userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue
+            if keyboardSizeNSValue == nil {return}
+            let keyboardSize = keyboardSizeNSValue!.CGRectValue()
+            let duration = userInfo[UIKeyboardAnimationDurationUserInfoKey] as? Double
+            if duration == nil {return}
+            let curve = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? UInt
+            if curve == nil {return}
+            let options = UIViewAnimationOptions(rawValue: curve!)
+            
+            UIView.animateWithDuration(duration!, delay: 0.0, options: options, animations: { () -> Void in
+                
+                if notification.name == UIKeyboardWillShowNotification { // keyboard will up
+                    
+                    if let activeTextField = self.view.getFirstResponder() {// one field is active
+                        let someExtraDistance: CGFloat = 10.0 // some distance from textfield for better user experience.
+                        var distanceFromTFToKeyboard = (self.view.frame.height - activeTextField.frame.maxY) - keyboardSize.height
+                        print("distanceFromTFToKeyboard: \(distanceFromTFToKeyboard)")
+                        if distanceFromTFToKeyboard == -19.0 { // when suggestion view open
+                            self.moveViewWithIncreaseORDecreaseY(19.0 + someExtraDistance, _duration: duration!, _options: options)
+                        }else if distanceFromTFToKeyboard < 0 {
+                            distanceFromTFToKeyboard -= someExtraDistance
+                            self.moveViewAtY(distanceFromTFToKeyboard, _duration: duration!, _options: options)
+                        }
+                    }
+                    
+                }else if notification.name == UIKeyboardWillHideNotification { // keyboard will down
+                    self.moveViewAtY(0.0, _duration: duration!, _options: options)
+                }
+                
+                }, completion: nil)
+            
+        }
+        
+    }
+    
+    // helper func to move the view with all components
+    func moveViewAtY(_yAxis: CGFloat, _duration: Double, _options: UIViewAnimationOptions){
+        
+        func _updateLayoutSubviews(){
+            for subview in self.view.subviews{
+                subview.layoutSubviews()
+            }
+        }
+        
+        for cons in self.view.constraints {
+            
+            //print("cons.dynamicType: \(cons.dynamicType)| cons.firstItem.dynamicType: \(cons.firstItem.dynamicType)| cons.secondItem.dynamicType: \(cons.secondItem.dynamicType)| \n")
+            
+            if "\(cons.dynamicType)" == "_UILayoutSupportConstraint" {
+                
+                if let _ = cons.secondItem as? UIView {
+                    //print("desc: \(cons.firstItem)| \(cons.secondItem) \n\n")
+                    
+                    cons.constant = _yAxis
+                    self.view.layoutIfNeeded() // update frames for view
+                    _updateLayoutSubviews() // update frames for all sub views
+                    
+                    
+                }
+                
+            }
+            
+            
+        }
+        
+    }
+    
+    func moveViewWithIncreaseORDecreaseY(_yAxis: CGFloat, _duration: Double, _options: UIViewAnimationOptions){
+        
+        func _updateLayoutSubviews(){
+            for subview in self.view.subviews{
+                subview.layoutSubviews()
+            }
+        }
+        
+        for cons in self.view.constraints {
+            
+            //print("cons.dynamicType: \(cons.dynamicType)| cons.firstItem.dynamicType: \(cons.firstItem.dynamicType)| cons.secondItem.dynamicType: \(cons.secondItem.dynamicType)| \n")
+            
+            if "\(cons.dynamicType)" == "_UILayoutSupportConstraint" {
+                
+                if let _ = cons.secondItem as? UIView {
+                    //print("desc: \(cons.firstItem)| \(cons.secondItem) \n\n")
+                    
+                    cons.constant -= _yAxis
+                    self.view.layoutIfNeeded() // update frames for view
+                    _updateLayoutSubviews() // update frames for all sub views
+                    
+                    
+                }
+                
+            }
+            
+            
+        }
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+}
+
+
+
+
+
+
+
+
+
+
+
 
