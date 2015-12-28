@@ -22,19 +22,13 @@ class TextFieldValidationVC: UIViewController {
         
         textField1.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, isRequired: true)
         textField2.setValidation(6, maxTextLimit: 100, keyboardType: UIKeyboardType.EmailAddress, isRequired: true)
-        textField3.setValidation(11, maxTextLimit: 100, keyboardType: UIKeyboardType.NumberPad)
+        textField3.setValidation(1, maxTextLimit: 100, keyboardType: UIKeyboardType.NumberPad)
         textField4.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
         textField5.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
 
-        let tapGesture = UITapGestureRecognizer(target: self, action: Selector("hideKeyboard"))
-        self.view.addGestureRecognizer(tapGesture)
-        
         
     }
     
-    func hideKeyboard() {
-        self.view.endEditing(true)
-    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

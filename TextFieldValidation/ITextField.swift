@@ -656,7 +656,8 @@ extension String{
 }
 
 extension UIView {
-    
+
+    // validation method for all textfield with first in first out priority in view
     func validateAllTextFields(){
         
         // get all tf in view with first in first out priority
@@ -696,7 +697,11 @@ extension UIView {
         
     }
     
-    
+    // hide keyboard when tap on outside the textfield
+    public override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        super.touchesBegan(touches, withEvent: event)
+            self.endEditing(true)
+    }
     
 }
 
