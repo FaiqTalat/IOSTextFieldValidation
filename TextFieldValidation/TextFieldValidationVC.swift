@@ -26,6 +26,14 @@ class TextFieldValidationVC: UIViewController {
         textField4.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
         textField5.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
 
+        let tapGesture = UITapGestureRecognizer(target: self, action: Selector("hideKeyboard"))
+        self.view.addGestureRecognizer(tapGesture)
+        
+        
+    }
+    
+    func hideKeyboard() {
+        self.view.endEditing(true)
     }
 
     override func didReceiveMemoryWarning() {

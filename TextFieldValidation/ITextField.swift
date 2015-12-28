@@ -194,6 +194,11 @@ class ITextField: UITextField, UITextFieldDelegate {
             return
         }
         
+        if isRequired && text!.textLength() < 1 { // required field and nothing is written in text
+            showRequiredMsg()
+            return
+        }
+        
         forceToEdit = true
         
         validate()
@@ -216,12 +221,6 @@ class ITextField: UITextField, UITextFieldDelegate {
             changeLinesColor(lineColor)
             removeValidationViewIfNeeded()
             removeTitleLabelIfNeeded()
-            
-            if !forceToEdit {
-                iLog("\(className), \(__FUNCTION__), isValidated: \(isValidated), forceToEdit: \(forceToEdit)")
-                self.resignFirstResponder() // if validated so resign it
-            }
-            
         }
         
         iLog("\(className), \(__FUNCTION__), isValidated: \(isValidated)")
@@ -273,10 +272,9 @@ class ITextField: UITextField, UITextFieldDelegate {
         iLog("\(className), \(__FUNCTION__), newText: \(textField.text)")
         manageTitle()
 
-        if !isRequired && text!.textLength() < 1 { // optional field and nothing is written in text so valid it without validate.
+        if !isRequired && text!.textLength() < 1 { // optional field and nothing is written in text
+
             isValidated = true
-            removeValidationViewIfNeeded()
-            removeTitleLabelIfNeeded()
             changeLinesColor(lineColor)
             iLog("\(className), \(__FUNCTION__), Optional Field isValidated: \(isValidated).")
             
@@ -285,8 +283,20 @@ class ITextField: UITextField, UITextFieldDelegate {
             return
         }
         
+        if isRequired && text!.textLength() < 1 { // required field and nothing is written in text
+            showRequiredMsg()
+            return
+        }
+
         isValidated = false
         lastValidationCheckedStatus = false
+        
+        if keyboardType == .EmailAddress { // when user is typing email! dont show invalid email msg when user done then check and show invalid msg
+            hideOptionalORRequiredMsg()
+            return
+        }
+        
+        
         validate()
         
     }
@@ -357,7 +367,12 @@ class ITextField: UITextField, UITextFieldDelegate {
         self.forceToResign = true
         
         if !isRequired && text!.textLength() < 1 { // optional field and nothing is written in text
-            hideOptionalMsg()
+            hideOptionalORRequiredMsg()
+            return
+        }
+        
+        if isRequired && text!.textLength() < 1 { // required field and nothing is written in text
+            hideOptionalORRequiredMsg()
             return
         }
         
@@ -408,10 +423,13 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     // helper func's
     
+    func showRequiredMsg(){
+        _showValidationMsg("Required")
+    }
     func showOptionalMsg(){
         _showValidationMsg("Optional")
     }
-    func hideOptionalMsg(){
+    func hideOptionalORRequiredMsg(){
         _hideValidationMsg()
         removeValidationViewIfNeeded()
     }
