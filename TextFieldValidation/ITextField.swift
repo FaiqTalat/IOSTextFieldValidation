@@ -23,11 +23,11 @@ class ITextField: UITextField, UITextFieldDelegate {
             return validate()
         }
         
-        if !isRequired && text.textLength() > 0 { // if typed something in optional field then validate it also.
+        if !isRequired && text!.textLength() > 0 { // if typed something in optional field then validate it also.
             return validate()
         }
         
-        if !isRequired && text.textLength() < 1 { // optional field and nothing is written in text so valid it without validate.
+        if !isRequired && text!.textLength() < 1 { // optional field and nothing is written in text so valid it without validate.
             isValidated = true
             removeValidationViewIfNeeded()
             removeTitleLabelIfNeeded()
@@ -44,7 +44,7 @@ class ITextField: UITextField, UITextFieldDelegate {
         
         return false // other cases
     }
-    let className = "ITextField"
+    var className = "ITextField"
     var isHeightInitialized = false
     let placeholderColor = UIColor(red: 199.0/255, green: 199.0/255, blue: 205.0/255, alpha: 1.0)
     let padding = UIEdgeInsets(top: 0, left: 10, bottom: 3, right: 10);
@@ -105,13 +105,15 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     // initialize
     required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        super.init(coder: aDecoder)!
         self.className = "\(self.className), \(self.placeholder)"
         iLog("\(className), \(__FUNCTION__)")
         self.delegate = self
         self.addTarget(self, action: "textFieldDidChange:", forControlEvents: UIControlEvents.EditingChanged)
         // editing pointer color
         self.tintColor = self._titleColor
+        
+        self.returnKeyType = .Done
         
         
         
@@ -178,14 +180,27 @@ class ITextField: UITextField, UITextFieldDelegate {
         
     }
     
-    
     // got focus
     func textFieldDidBeginEditing(textField: UITextField) {
         iLog("\(className), \(__FUNCTION__)")
         
+        // add done button on numeric keyboard
+        if keyboardType == .NumberPad || keyboardType == .PhonePad {
+            addDoneButtonOnKeyboard()
+        }
+        
+        if !isRequired && text!.textLength() < 1 { // optional field and nothing is written in text
+            showOptionalMsg()
+            return
+        }
+        
         forceToEdit = true
         
         validate()
+        
+        if isRequired { // auto show done button when typed something in text just for required fields
+            self.enablesReturnKeyAutomatically = true
+        }
         
     }
     
@@ -258,12 +273,15 @@ class ITextField: UITextField, UITextFieldDelegate {
         iLog("\(className), \(__FUNCTION__), newText: \(textField.text)")
         manageTitle()
 
-        if !isRequired && text.textLength() < 1 { // optional field and nothing is written in text so valid it without validate.
+        if !isRequired && text!.textLength() < 1 { // optional field and nothing is written in text so valid it without validate.
             isValidated = true
             removeValidationViewIfNeeded()
             removeTitleLabelIfNeeded()
             changeLinesColor(lineColor)
             iLog("\(className), \(__FUNCTION__), Optional Field isValidated: \(isValidated).")
+            
+            showOptionalMsg()
+            
             return
         }
         
@@ -273,15 +291,11 @@ class ITextField: UITextField, UITextFieldDelegate {
         
     }
     
-    
-    
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        validateAllTextFields()
+        self.superview?.validateAllTextFields()
         return true
     }
-    
-    
     
     func _checkMinTextLimit(){
         
@@ -336,12 +350,16 @@ class ITextField: UITextField, UITextFieldDelegate {
         }
     }
     
-    
     // release focus
     func textFieldDidEndEditing(textField: UITextField) {
         iLog("\(className), \(__FUNCTION__)")
         
         self.forceToResign = true
+        
+        if !isRequired && text!.textLength() < 1 { // optional field and nothing is written in text
+            hideOptionalMsg()
+            return
+        }
         
         validate()
         
@@ -350,7 +368,6 @@ class ITextField: UITextField, UITextFieldDelegate {
         removeValidationViewIfNeeded()
         
     }
-    
     
     // MARK: Validation Methods
     
@@ -389,53 +406,14 @@ class ITextField: UITextField, UITextFieldDelegate {
         self.maxTextLimit = nil
     }
     
-    
-    
-    
-    
     // helper func's
     
-    func validateAllTextFields(){
-        if let _superview = self.superview {
-            var allITextfields = [ITextField]()
-            for _subview in _superview.subviews {
-                if let _iTextField = _subview as? ITextField {
-                    iLog("\(className), \(__FUNCTION__), _iTextField.placeholder: \(_iTextField.placeholder)")
-
-                    allITextfields.append(_iTextField)
-                    
-                }
-            }
-
-            getTextFieldsWithPriority(allITextfields)
-            
-        }
+    func showOptionalMsg(){
+        _showValidationMsg("Optional")
     }
-    
-    func getTextFieldsWithPriority(textfields: [ITextField])->[ITextField]{
-        
-        var _allTFWithXY = [CGFloat: ITextField]()
-        var _allTFWithPriority = [ITextField]()
-        
-        // ascending all tf with respect to Y
-        for _iTextField in textfields{
-            let _iTextField_XPlusY = _iTextField.frame.origin.x + _iTextField.frame.origin.y
-            _allTFWithXY[_iTextField_XPlusY] = _iTextField
-        }
-        
-        let allTFSortedByXY = _allTFWithXY.keys.array.sorted { (first, second) -> Bool in
-            return first < second
-        }
-        iLog("allTFSortedByXY: \(allTFSortedByXY)")
-        
-        for _iTextFieldY in allTFSortedByXY{
-            if let _iTextField = _allTFWithXY[_iTextFieldY]{
-                iLog("Sorted By X & Y _iTextField.placeholder: \(_iTextField.placeholder)")
-                _allTFWithPriority.append(_iTextField)
-            }
-        }
-        
-        return _allTFWithPriority
+    func hideOptionalMsg(){
+        _hideValidationMsg()
+        removeValidationViewIfNeeded()
     }
     
     func addTitleLabel(){
@@ -489,9 +467,6 @@ class ITextField: UITextField, UITextFieldDelegate {
         }
         
     }
-    
-    
-    
     
     func addValidationViewIfNeeded(){
         
@@ -603,6 +578,24 @@ class ITextField: UITextField, UITextFieldDelegate {
         
     }
     
+    func addDoneButtonOnKeyboard(){
+        
+        let doneToolbar: UIToolbar = UIToolbar()
+        doneToolbar.sizeToFit()
+        
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Done", style: UIBarButtonItemStyle.Done, target: self, action: Selector("doneButtonAction"))
+        doneToolbar.items = [flexSpace, done]
+       
+        self.inputAccessoryView = doneToolbar
+        
+    }
+    
+    func doneButtonAction(){
+        self.resignFirstResponder()
+        self.superview?.validateAllTextFields()
+    }
+    
     private func newBounds(bounds: CGRect) -> CGRect {
         //iLog("\(className), \(__FUNCTION__)")
         var newBounds = bounds
@@ -625,23 +618,67 @@ class ITextField: UITextField, UITextFieldDelegate {
         }
     }
     
-    
 }
 
 
 extension String{
     
     func textLength()->Int{
-        let textLength = countElements(self)
+        let textLength = self.characters.count
         return textLength
     }
     
     var isEmail: Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}"
         let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        let result = emailTest?.evaluateWithObject(self)
-        return result!
+        let result = emailTest.evaluateWithObject(self)
+        return result
     }
+    
+}
+
+extension UIView {
+    
+    func validateAllTextFields(){
+        
+        // get all tf in view with first in first out priority
+        func _getTextFieldsWithPriorityAndCheckIsValid(textfields: [ITextField]){
+            
+            var _allTFWithY = [CGFloat: ITextField]()
+            
+            // ascending all tf with respect to Y
+            for _iTextField in textfields{
+                let _iTextField_Y = _iTextField.frame.origin.y + CGFloat(_allTFWithY.count)
+                _allTFWithY[_iTextField_Y] = _iTextField
+            }
+            
+            let allTFSortedByY = Array(_allTFWithY.keys).sort()
+            
+            for _iTextFieldY in allTFSortedByY{
+                if let _iTextField = _allTFWithY[_iTextFieldY]{
+                    if !_iTextField.isValid { // is one TF is invalid so no try another tf
+                        return
+                    }
+                }
+            }
+            
+        }
+        
+        // get all tf in view
+            var allITextfields = [ITextField]()
+            for _subview in self.subviews {
+                if let _iTextField = _subview as? ITextField {
+                    allITextfields.append(_iTextField)
+                }
+            }
+            
+            _getTextFieldsWithPriorityAndCheckIsValid(allITextfields)
+            
+        
+        
+    }
+    
+    
     
 }
 

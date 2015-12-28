@@ -22,13 +22,10 @@ class TextFieldValidationVC: UIViewController {
         
         textField1.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, isRequired: true)
         textField2.setValidation(6, maxTextLimit: 100, keyboardType: UIKeyboardType.EmailAddress, isRequired: true)
-        textField3.setValidation(11, maxTextLimit: 100, keyboardType: UIKeyboardType.PhonePad)
+        textField3.setValidation(11, maxTextLimit: 100, keyboardType: UIKeyboardType.NumberPad)
         textField4.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
         textField5.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
-        
-        
-        textField1.validateAllTextFields()
-        
+
     }
 
     override func didReceiveMemoryWarning() {
@@ -37,14 +34,10 @@ class TextFieldValidationVC: UIViewController {
     }
 
     @IBAction func validateAllFields(sender: AnyObject) {
-        _validateAllFields()
+        self.view.validateAllTextFields()
     }
     
-    func _validateAllFields(){
-        if textField1.isValid && textField2.isValid && textField3.isValid && textField4.isValid && textField5.isValid {
-            print("All Fields Validated.\n")
-        }
-    }
+
 
 }
 

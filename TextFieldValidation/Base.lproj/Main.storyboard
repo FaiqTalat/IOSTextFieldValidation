@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
     </dependencies>
     <scenes>
         <!--Demo TextFields-->
@@ -17,7 +18,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Email Address:" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="UlW-na-iiL" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
-                                <rect key="frame" x="20" y="127" width="560" height="17"/>
+                                <rect key="frame" x="20" y="83" width="270" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
@@ -28,12 +29,7 @@
                                 <nil key="highlightedColor"/>
                                 <size key="shadowOffset" width="2" height="2"/>
                             </label>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name:" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QZ0-w5-tJi" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
-                                <rect key="frame" x="20" y="85" width="560" height="17"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" keyboardType="namePhonePad"/>
-                            </textField>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cjH-Ip-fGF">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cjH-Ip-fGF">
                                 <rect key="frame" x="191" y="547" width="219" height="33"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="27"/>
@@ -47,42 +43,47 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Phone:" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hOB-LK-Oxu" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
-                                <rect key="frame" x="20" y="169" width="560" height="17"/>
+                                <rect key="frame" x="20" y="125" width="560" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Old Password:" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Nv9-Q0-iiR" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
-                                <rect key="frame" x="20" y="211" width="560" height="17"/>
+                                <rect key="frame" x="20" y="167" width="560" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="New Password:" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="5Ek-Vf-lJv" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
-                                <rect key="frame" x="20" y="253" width="560" height="17"/>
+                                <rect key="frame" x="20" y="209" width="560" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name:" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QZ0-w5-tJi" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
+                                <rect key="frame" x="310" y="83" width="270" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" keyboardType="namePhonePad"/>
                             </textField>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="hOB-LK-Oxu" firstAttribute="top" secondItem="UlW-na-iiL" secondAttribute="bottom" constant="25" id="2kU-J2-8kb"/>
+                            <constraint firstAttribute="trailing" secondItem="QZ0-w5-tJi" secondAttribute="trailing" constant="20" id="101-aT-089"/>
                             <constraint firstItem="Nv9-Q0-iiR" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="71U-h2-MLF"/>
-                            <constraint firstAttribute="trailing" secondItem="UlW-na-iiL" secondAttribute="trailing" constant="20" id="9Qo-25-8UW"/>
-                            <constraint firstItem="UlW-na-iiL" firstAttribute="top" secondItem="QZ0-w5-tJi" secondAttribute="bottom" constant="25" id="Aqt-Ao-QkK"/>
                             <constraint firstAttribute="trailing" secondItem="kkO-3n-f9g" secondAttribute="trailing" id="FDe-Ew-RTQ"/>
                             <constraint firstAttribute="trailing" secondItem="5Ek-Vf-lJv" secondAttribute="trailing" constant="20" id="FXU-Ga-9VL"/>
                             <constraint firstItem="hOB-LK-Oxu" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="Fh3-lV-5kK"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="cjH-Ip-fGF" secondAttribute="bottom" constant="20" id="HoA-YU-2ph"/>
                             <constraint firstItem="Nv9-Q0-iiR" firstAttribute="top" secondItem="hOB-LK-Oxu" secondAttribute="bottom" constant="25" id="PjO-kE-qo7"/>
-                            <constraint firstItem="QZ0-w5-tJi" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="RI1-Rw-zHq"/>
+                            <constraint firstItem="hOB-LK-Oxu" firstAttribute="top" secondItem="UlW-na-iiL" secondAttribute="bottom" constant="25" id="QKW-Te-3Ax"/>
+                            <constraint firstItem="UlW-na-iiL" firstAttribute="top" secondItem="kkO-3n-f9g" secondAttribute="bottom" constant="28" id="R3A-QI-sSn"/>
                             <constraint firstAttribute="trailing" secondItem="Nv9-Q0-iiR" secondAttribute="trailing" constant="20" id="Rj8-DX-iUV"/>
                             <constraint firstItem="5Ek-Vf-lJv" firstAttribute="top" secondItem="Nv9-Q0-iiR" secondAttribute="bottom" constant="25" id="Sf6-vc-gjp"/>
-                            <constraint firstItem="UlW-na-iiL" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="TVh-K4-VsG"/>
-                            <constraint firstItem="QZ0-w5-tJi" firstAttribute="top" secondItem="kkO-3n-f9g" secondAttribute="bottom" constant="30" id="UAS-L6-goQ"/>
                             <constraint firstAttribute="trailing" secondItem="hOB-LK-Oxu" secondAttribute="trailing" constant="20" id="Vbm-et-ofh"/>
-                            <constraint firstAttribute="trailing" secondItem="QZ0-w5-tJi" secondAttribute="trailing" constant="20" id="h3s-ju-K9Y"/>
+                            <constraint firstItem="QZ0-w5-tJi" firstAttribute="centerY" secondItem="UlW-na-iiL" secondAttribute="centerY" id="dul-6E-vcW"/>
+                            <constraint firstItem="QZ0-w5-tJi" firstAttribute="leading" secondItem="UlW-na-iiL" secondAttribute="trailing" constant="20" id="esJ-ZJ-vNx"/>
                             <constraint firstItem="kkO-3n-f9g" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="i6e-l1-6Vz"/>
                             <constraint firstItem="cjH-Ip-fGF" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="jGk-P7-pZl"/>
                             <constraint firstItem="5Ek-Vf-lJv" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="riJ-RK-FOw"/>
+                            <constraint firstItem="UlW-na-iiL" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="th4-ux-RWe"/>
+                            <constraint firstItem="QZ0-w5-tJi" firstAttribute="width" secondItem="UlW-na-iiL" secondAttribute="width" id="uB5-WF-BUE"/>
                             <constraint firstItem="kkO-3n-f9g" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="uiE-hc-Jgu"/>
                         </constraints>
                     </view>
@@ -96,6 +97,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="414" y="137"/>
         </scene>
     </scenes>
 </document>
