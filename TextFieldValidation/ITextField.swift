@@ -654,26 +654,36 @@ extension String{
     
 }
 
-extension UIView {
+extension UIScrollView {
+    // hide keyboard when tap on outside the textfield
+    public override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        super.touchesBegan(touches, withEvent: event)
+        self.endEditing(true)
+    }
+}
 
+extension UIView {
+    
     // validation method for all textfield with first in first out priority in view
     func validateAllTextFields()->Bool{
         
         // get all tf in view with first in first out priority
         func _getTextFieldsWithPriorityAndCheckIsValid(textfields: [ITextField])->Bool{
             
-            var _allTFWithY = [CGFloat: ITextField]()
+            var _allTFWithXY = [CGFloat: ITextField]()
             
             // ascending all tf with respect to Y
             for _iTextField in textfields{
-                let _iTextField_Y = _iTextField.frame.origin.y + CGFloat(_allTFWithY.count)
-                _allTFWithY[_iTextField_Y] = _iTextField
+                //iLog("\(self.dynamicType), \(__FUNCTION__), (for _iTextField in textfields) \(_iTextField.placeholder)")
+                let _iTextField_XY = _iTextField.frame.origin.x * _iTextField.frame.origin.y
+                _allTFWithXY[_iTextField_XY] = _iTextField
             }
             
-            let allTFSortedByY = Array(_allTFWithY.keys).sort()
+            let allTFSortedByY = Array(_allTFWithXY.keys).sort()
+            //iLog("\(self.dynamicType), \(__FUNCTION__), allTFSortedByY \(allTFSortedByY)")
             
             for _iTextFieldY in allTFSortedByY{
-                if let _iTextField = _allTFWithY[_iTextFieldY]{
+                if let _iTextField = _allTFWithXY[_iTextFieldY]{
                     if !_iTextField.isValid { // is one TF is invalid so no try another tf
                         return false
                     }
@@ -684,30 +694,67 @@ extension UIView {
         }
         
         // get all tf in view
-            var allITextfields = [ITextField]()
-            for _subview in self.subviews {
+        var allITextfields = [ITextField]()
+        
+        // check if scroll view or not
+        
+        for _subview in self.subviews {
+            
+            iLog("\(self.dynamicType), \(__FUNCTION__), _subview.dynamicType \(_subview.dynamicType)")
+            
+            // if scroll view then find in scroll subviews
+            if "\(_subview.dynamicType)" == "UIScrollView" {
+                
+                for __subview in _subview.subviews {
+                    
+                    if let _iTextField = __subview as? ITextField {
+                        allITextfields.append(_iTextField)
+                    }
+                    
+                }
+                
+            }else{ // all textfields direct in uiview
+                
                 if let _iTextField = _subview as? ITextField {
                     allITextfields.append(_iTextField)
                 }
+                
             }
-            
-           return _getTextFieldsWithPriorityAndCheckIsValid(allITextfields)
-           
+        }
+        
+        return _getTextFieldsWithPriorityAndCheckIsValid(allITextfields)
+        
     }
     
     // hide keyboard when tap on outside the textfield
     public override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         super.touchesBegan(touches, withEvent: event)
-            self.endEditing(true)
+        self.endEditing(true)
     }
     
     func getFirstResponder()->ITextField?{
         
         for _subview in self.subviews {
-            if _subview.isFirstResponder() {
-                if let _iTextField = _subview as? ITextField {
-                    return _iTextField
+            
+            // if scroll view then find in scroll subviews
+            if "\(_subview.dynamicType)" == "UIScrollView" {
+                
+                for __subview in _subview.subviews {
+                    
+                    if let _iTextField = __subview as? ITextField {
+                        return _iTextField
+                    }
+                    
                 }
+                
+            }else{ // all textfields direct in uiview
+                
+                if _subview.isFirstResponder() {
+                    if let _iTextField = _subview as? ITextField {
+                        return _iTextField
+                    }
+                }
+                
             }
         }
         
@@ -809,12 +856,6 @@ extension UIViewController {
     // helper func to move the view with all components
     func moveViewAtY(_yAxis: CGFloat, _duration: Double, _options: UIViewAnimationOptions){
         
-        func _updateLayoutSubviews(){
-            for subview in self.view.subviews{
-                subview.layoutSubviews()
-            }
-        }
-        
         for cons in self.view.constraints {
             
             //print("cons.dynamicType: \(cons.dynamicType)| cons.firstItem.dynamicType: \(cons.firstItem.dynamicType)| cons.secondItem.dynamicType: \(cons.secondItem.dynamicType)| \n")
@@ -840,12 +881,6 @@ extension UIViewController {
     
     func moveViewWithIncreaseORDecreaseY(_yAxis: CGFloat, _duration: Double, _options: UIViewAnimationOptions){
         
-        func _updateLayoutSubviews(){
-            for subview in self.view.subviews{
-                subview.layoutSubviews()
-            }
-        }
-        
         for cons in self.view.constraints {
             
             //print("cons.dynamicType: \(cons.dynamicType)| cons.firstItem.dynamicType: \(cons.firstItem.dynamicType)| cons.secondItem.dynamicType: \(cons.secondItem.dynamicType)| \n")
@@ -870,7 +905,23 @@ extension UIViewController {
     }
     
     
-    
+    func _updateLayoutSubviews(){
+        
+        for _subview in self.view.subviews {
+            
+            // if scroll view then find in scroll subviews
+            if "\(_subview.dynamicType)" == "UIScrollView" {
+                
+                for __subview in _subview.subviews {
+                    __subview.layoutSubviews()
+                }
+                
+            }else{ // all textfields direct in uiview
+                _subview.layoutSubviews()
+            }
+        }
+        
+    }
     
     
     
@@ -880,6 +931,22 @@ extension UIViewController {
 
 
 
+
+
+
+let isLog = true
+
+func iLog(data: AnyObject?){
+    if isLog && data != nil{
+        dispatch_async(dispatch_get_main_queue(),{
+            
+            // For Swift 1.2
+            print("\(data!)")
+            print("\n") // for new line after each log
+            
+        })
+    }
+}
 
 
 
