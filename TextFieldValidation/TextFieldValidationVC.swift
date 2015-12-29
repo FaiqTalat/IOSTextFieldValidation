@@ -39,7 +39,6 @@ class TextFieldValidationVC: UIViewController {
 
     @IBAction func validateAllFields(sender: AnyObject) {
         
-        
         let isAllTextFieldsValidated = self.view.validateAllTextFields()
         print("\(self.dynamicType), \(__FUNCTION__), isAllTextFieldsValidated: \(isAllTextFieldsValidated)")
         
@@ -47,8 +46,6 @@ class TextFieldValidationVC: UIViewController {
         for _textfield in allTextFieldsWithChangedText {
             print("\(self.dynamicType), \(__FUNCTION__), changedTextField: \(_textfield.placeholder!) with new text: \(_textfield.text!) \n\n")
         }
-        
-        
         
     }
     
