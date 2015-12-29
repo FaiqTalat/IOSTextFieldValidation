@@ -114,7 +114,7 @@ class ITextField: UITextField, UITextFieldDelegate {
         self.tintColor = self._titleColor
         
         self.returnKeyType = .Done
- 
+        
         //self.backgroundColor = UIColor.lightGrayColor()
         
     }
@@ -210,12 +210,12 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     func validate()->Bool{
         
-
+        
         self.validateEmailIfNeeded()
         self._checkMinTextLimit()
         self._checkMaxTextLimit()
         self.manageTitle()
-
+        
         if isValidated {
             changeLinesColor(lineColor)
             removeValidationViewIfNeeded()
@@ -270,9 +270,9 @@ class ITextField: UITextField, UITextFieldDelegate {
     func textFieldDidChange(textField: UITextField){
         iLog("\(className), \(__FUNCTION__), newText: \(textField.text)")
         manageTitle()
-
+        
         if !isRequired && text!.textLength() < 1 { // optional field and nothing is written in text
-
+            
             isValidated = true
             changeLinesColor(lineColor)
             iLog("\(className), \(__FUNCTION__), Optional Field isValidated: \(isValidated).")
@@ -286,7 +286,7 @@ class ITextField: UITextField, UITextFieldDelegate {
             showRequiredMsg()
             return
         }
-
+        
         isValidated = false
         lastValidationCheckedStatus = false
         
@@ -524,14 +524,14 @@ class ITextField: UITextField, UITextFieldDelegate {
         dispatch_async(dispatch_get_main_queue(),{
             self.updateValidationViewFrame()
             if self._validationView != nil {
-            self.iLog("\(self.className), \(__FUNCTION__), msg: \(msg)")
+                self.iLog("\(self.className), \(__FUNCTION__), msg: \(msg)")
                 self._validationLabel.text = msg
                 self._validationView.hidden = false
                 self.animateText(self._validationLabel)
                 self.lastValidationCheckedStatus = true
                 
                 if !self.forceToResign { // when user force to resign set focus out or in another textfield
-                self.becomeFirstResponder()
+                    self.becomeFirstResponder()
                 }
                 
             }
@@ -603,7 +603,7 @@ class ITextField: UITextField, UITextFieldDelegate {
         let flexSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
         let done: UIBarButtonItem = UIBarButtonItem(title: "Done", style: UIBarButtonItemStyle.Done, target: self, action: Selector("doneButtonAction"))
         doneToolbar.items = [flexSpace, done]
-       
+        
         self.inputAccessoryView = doneToolbar
         
     }
@@ -741,8 +741,10 @@ extension UIView {
                 
                 for __subview in _subview.subviews {
                     
-                    if let _iTextField = __subview as? ITextField {
-                        return _iTextField
+                    if __subview.isFirstResponder() {
+                        if let _iTextField = __subview as? ITextField {
+                            return _iTextField
+                        }
                     }
                     
                 }
@@ -755,6 +757,19 @@ extension UIView {
                     }
                 }
                 
+            }
+        }
+        
+        return nil
+    }
+    
+    func getScrollViewIfAny()->UIScrollView?{
+        
+        for _subview in self.subviews {
+            // if scroll view then find in scroll subviews
+            if let scrollView = _subview as? UIScrollView {
+                //iLog("scrollView: \(scrollView)")
+                return scrollView
             }
         }
         
@@ -814,7 +829,7 @@ extension UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector:"moveViewAccordingToActiveTextfield:", name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector:"moveViewAccordingToActiveTextfield:", name: UIKeyboardWillHideNotification, object: nil)
     }
-
+    
     func moveViewAccordingToActiveTextfield(notification: NSNotification) {
         
         if let userInfo = notification.userInfo {
@@ -834,6 +849,7 @@ extension UIViewController {
                     if let activeTextField = self.view.getFirstResponder() {// one field is active
                         let someExtraDistance: CGFloat = 10.0 // some distance from textfield for better user experience.
                         var distanceFromTFToKeyboard = (self.view.frame.height - activeTextField.frame.maxY) - keyboardSize.height
+                        
                         print("distanceFromTFToKeyboard: \(distanceFromTFToKeyboard)")
                         if distanceFromTFToKeyboard == -19.0 { // when suggestion view open
                             self.moveViewWithIncreaseORDecreaseY(19.0 + someExtraDistance, _duration: duration!, _options: options)
@@ -841,6 +857,7 @@ extension UIViewController {
                             distanceFromTFToKeyboard -= someExtraDistance
                             self.moveViewAtY(distanceFromTFToKeyboard, _duration: duration!, _options: options)
                         }
+                        
                     }
                     
                 }else if notification.name == UIKeyboardWillHideNotification { // keyboard will down
@@ -855,15 +872,26 @@ extension UIViewController {
     
     // helper func to move the view with all components
     func moveViewAtY(_yAxis: CGFloat, _duration: Double, _options: UIViewAnimationOptions){
+        //iLog("\(self.dynamicType), \(__FUNCTION__), _yAxis: \(_yAxis), _duration: \(_duration), _options: \(_options)")
         
+        
+        // 1. when scrollview exist so work as scrollview nature.
+        if let scrollView = self.view.getScrollViewIfAny() {
+            scrollView.contentInset.top = _yAxis
+            self.view.layoutIfNeeded() // update frames for view
+            _updateLayoutSubviews() // update frames for all sub views
+            return
+        }
+        
+        // 2. when direct view in viewcontroller
         for cons in self.view.constraints {
             
             //print("cons.dynamicType: \(cons.dynamicType)| cons.firstItem.dynamicType: \(cons.firstItem.dynamicType)| cons.secondItem.dynamicType: \(cons.secondItem.dynamicType)| \n")
             
             if "\(cons.dynamicType)" == "_UILayoutSupportConstraint" {
-                
+                //iLog("\(self.dynamicType), \(__FUNCTION__), cons.dynamicType: \(cons.dynamicType)")
                 if let _ = cons.secondItem as? UIView {
-                    //print("desc: \(cons.firstItem)| \(cons.secondItem) \n\n")
+                    //iLog("\(self.dynamicType), \(__FUNCTION__), desc: \(cons.firstItem)| \(cons.secondItem)")
                     
                     cons.constant = _yAxis
                     self.view.layoutIfNeeded() // update frames for view
@@ -871,16 +899,26 @@ extension UIViewController {
                     
                     
                 }
-                
             }
             
-            
         }
+        
         
     }
     
     func moveViewWithIncreaseORDecreaseY(_yAxis: CGFloat, _duration: Double, _options: UIViewAnimationOptions){
+        iLog("\(self.dynamicType), \(__FUNCTION__)")
         
+        
+        // 1. when scrollview exist so work as scrollview nature.
+        if let scrollView = self.view.getScrollViewIfAny() {
+            scrollView.contentInset.top -= _yAxis
+            self.view.layoutIfNeeded() // update frames for view
+            _updateLayoutSubviews() // update frames for all sub views
+            return
+        }
+        
+        // 2. when direct view in viewcontroller
         for cons in self.view.constraints {
             
             //print("cons.dynamicType: \(cons.dynamicType)| cons.firstItem.dynamicType: \(cons.firstItem.dynamicType)| cons.secondItem.dynamicType: \(cons.secondItem.dynamicType)| \n")
@@ -899,8 +937,8 @@ extension UIViewController {
                 
             }
             
-            
         }
+        
         
     }
     
@@ -911,7 +949,8 @@ extension UIViewController {
             
             // if scroll view then find in scroll subviews
             if "\(_subview.dynamicType)" == "UIScrollView" {
-                
+                _subview.layoutIfNeeded()
+                _subview.layoutSubviews()
                 for __subview in _subview.subviews {
                     __subview.layoutSubviews()
                 }
@@ -922,6 +961,8 @@ extension UIViewController {
         }
         
     }
+    
+    
     
     
     
