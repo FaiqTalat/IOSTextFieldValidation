@@ -10,7 +10,7 @@ import UIKit
 
 class ITextField: UITextField, UITextFieldDelegate {
     
-    let isLog = false
+    let isLog = true
     var previousText: String?
     var isTextChanged = false
     var isNewTextUpdated = false
@@ -1023,7 +1023,7 @@ extension UIViewController {
     func moveViewAccordingToActiveTextfield(notification: NSNotification) {
         
         if let userInfo = notification.userInfo {
-            let keyboardSizeNSValue = userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue
+            let keyboardSizeNSValue = userInfo[UIKeyboardFrameBeginUserInfoKey] as? NSValue
             if keyboardSizeNSValue == nil {return}
             let keyboardSize = keyboardSizeNSValue!.CGRectValue()
             let duration = userInfo[UIKeyboardAnimationDurationUserInfoKey] as? Double
@@ -1040,6 +1040,27 @@ extension UIViewController {
                         let someExtraDistance: CGFloat = 10.0 // some distance from textfield for better user experience.
                         var distanceFromTFToKeyboard = (self.view.frame.height - activeTextField.frame.maxY) - keyboardSize.height
                         
+                        
+                        // CASE:1 when scrollView Exist. (move keyboard accordint to scroll view and super uiview)
+                        if let scrollView = self.view.getScrollViewIfAny(){
+                            scrollView.contentInset.top = 0
+                            scrollView.scrollRectToVisible(CGRect(x: 0, y: 0, width: scrollView.frame.size.width, height: scrollView.frame.size.height), animated: false)
+                            let activeTextFieldFrameWhenScrollViewExist = scrollView.convertRect(activeTextField.frame, toView: self.view)
+                            var distanceFromTFToKeyboardWhenScrollViewExist = (self.view.frame.height - activeTextFieldFrameWhenScrollViewExist.maxY) - keyboardSize.height
+                            iLog("distanceFromTFToKeyboardWhenScrollViewExist: \(distanceFromTFToKeyboardWhenScrollViewExist)")
+                            
+                            if distanceFromTFToKeyboardWhenScrollViewExist == -19.0 { // when suggestion view open
+                                self.moveViewWithIncreaseORDecreaseY(19.0 + someExtraDistance, _duration: duration!, _options: options)
+                            }else if distanceFromTFToKeyboardWhenScrollViewExist < 0 {
+                                distanceFromTFToKeyboardWhenScrollViewExist -= someExtraDistance
+                                self.moveViewAtY(distanceFromTFToKeyboardWhenScrollViewExist, _duration: duration!, _options: options)
+                            }
+                            
+                            return
+                        }
+                        
+                        
+                        // CASE:2 when only UIView as super view exist.
                         iLog("distanceFromTFToKeyboard: \(distanceFromTFToKeyboard)")
                         if distanceFromTFToKeyboard == -19.0 { // when suggestion view open
                             self.moveViewWithIncreaseORDecreaseY(19.0 + someExtraDistance, _duration: duration!, _options: options)
@@ -1062,14 +1083,17 @@ extension UIViewController {
     
     // helper func to move the view with all components
     func moveViewAtY(_yAxis: CGFloat, _duration: Double, _options: UIViewAnimationOptions){
-        //iLog("\(self.dynamicType), \(__FUNCTION__), _yAxis: \(_yAxis), _duration: \(_duration), _options: \(_options)")
+        iLog("\(self.dynamicType), \(__FUNCTION__), _yAxis: \(_yAxis), _duration: \(_duration), _options: \(_options)")
         
         
         // 1. when scrollview exist so work as scrollview nature.
         if let scrollView = self.view.getScrollViewIfAny() {
+            iLog("\(self.dynamicType), \(__FUNCTION__), Old: scrollView.contentInset: \(scrollView.contentInset)")
             scrollView.contentInset.top = _yAxis
+            scrollView.scrollRectToVisible(CGRect(x: scrollView.frame.origin.x, y: _yAxis, width: scrollView.frame.size.width, height: scrollView.frame.size.height), animated: false)
             self.view.layoutIfNeeded() // update frames for view
             _updateLayoutSubviews() // update frames for all sub views
+            iLog("\(self.dynamicType), \(__FUNCTION__), New: scrollView.contentInset: \(scrollView.contentInset)")
             return
         }
         
@@ -1165,7 +1189,7 @@ extension UIViewController {
 
 
 
-let isLog = false
+let isLog = true
 
 func iLog(data: AnyObject?){
     if isLog && data != nil{
