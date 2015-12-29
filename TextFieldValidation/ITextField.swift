@@ -969,7 +969,6 @@ extension UIView {
     
 }
 
-// extend all uiviewcontroller classes from LoginUserDelegate add self in delegates
 extension UIViewController {
     
     public override static func initialize() {
