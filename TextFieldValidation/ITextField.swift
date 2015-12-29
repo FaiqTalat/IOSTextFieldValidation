@@ -21,6 +21,15 @@ class ITextField: UITextField, UITextFieldDelegate {
         self.forceToResign = false
         self.forceToEdit = false
         
+        if !watchValidation { // validation not set for this textfield so consider it as validated.
+            isValidated = true
+            removeValidationViewIfNeeded()
+            removeTitleLabelIfNeeded()
+            changeLinesColor(lineColor)
+            iLog("\(className), \(__FUNCTION__), watchValidation: \(watchValidation).")
+            return isValidated
+        }
+        
         if text!.textLength() > 0 && firstTextField != nil && firstTextField?.text == self.text { // first TF and second TF Text is same like old pass and new pass is same
             if self.placeholder != nil {
                 isValidated = false
@@ -263,6 +272,14 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     func validate()->Bool{
         
+        if !watchValidation { // validation not set for this textfield so consider it as validated.
+            isValidated = true
+            removeValidationViewIfNeeded()
+            removeTitleLabelIfNeeded()
+            changeLinesColor(lineColor)
+            iLog("\(className), \(__FUNCTION__), watchValidation: \(watchValidation).")
+            return isValidated
+        }
         
         self.validateEmailIfNeeded()
         self._checkMinTextLimit()
