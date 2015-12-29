@@ -10,7 +10,10 @@ import UIKit
 
 class ITextField: UITextField, UITextFieldDelegate {
     
-    let isLog = true
+    let isLog = false
+    var previousText: String?
+    var isTextChanged = false
+    var isNewTextUpdated = false
     var isRequired = false
     var isValid: Bool {
         iLog("\(className), \(__FUNCTION__)")
@@ -137,12 +140,15 @@ class ITextField: UITextField, UITextFieldDelegate {
         super.didMoveToSuperview()
         
         setupLines()
+
         
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         //iLog("\(className), \(__FUNCTION__), \(self.placeholder)")
+        
+        manageTitle()
         
         updateLines()
         
@@ -197,6 +203,8 @@ class ITextField: UITextField, UITextFieldDelegate {
     func textFieldDidBeginEditing(textField: UITextField) {
         iLog("\(className), \(__FUNCTION__)")
         
+        getPreviousTextIfAny()
+        
         // add done button on numeric keyboard
         if keyboardType == .NumberPad || keyboardType == .PhonePad {
             addDoneButtonOnKeyboard()
@@ -220,6 +228,37 @@ class ITextField: UITextField, UITextFieldDelegate {
             self.enablesReturnKeyAutomatically = true
         }
         
+    }
+    
+    // get previous text
+    func getPreviousTextIfAny(){
+        
+        if previousText == nil {
+            previousText = self.text
+        }
+        
+    }
+    // compare old and new text
+    func comparePreviousTextWithNewText(){
+        
+        if previousText == nil{ return }
+        if self.text == nil || self.text?.textLength() < 1 {
+            self.isTextChanged = false // no changes
+            return
+        }
+        
+        if self.text!.lowercaseString != previousText!.lowercaseString { // previous and new text is changed.
+            self.isTextChanged = true // changed
+        }else{
+            self.isTextChanged = false // no changes
+        }
+        iLog("\(className), \(__FUNCTION__), isTextChanged: \(isTextChanged)")
+        
+    }
+    // reset it when updated.
+    func newTextUpdated(){
+        self.previousText = nil
+        self.isTextChanged = false
     }
     
     func validate()->Bool{
@@ -326,7 +365,7 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
 
-        if firstTextField != nil && firstTextField?.text == self.text { // first TF and second TF Text is same like old pass and new pass is same
+        if text!.textLength() > 0 && firstTextField != nil && firstTextField?.text == self.text { // first TF and second TF Text is same like old pass and new pass is same
             if self.placeholder != nil {
                 isValidated = false
                 lastValidationCheckedStatus = false
@@ -414,9 +453,11 @@ class ITextField: UITextField, UITextFieldDelegate {
     func textFieldDidEndEditing(textField: UITextField) {
         iLog("\(className), \(__FUNCTION__)")
         
+        comparePreviousTextWithNewText()
+        
         self.forceToResign = true
         
-        if firstTextField != nil && firstTextField?.text == self.text { // first TF and second TF Text is same like old pass and new pass is same
+        if text!.textLength() > 0 && firstTextField != nil && firstTextField?.text == self.text { // first TF and second TF Text is same like old pass and new pass is same
             if self.placeholder != nil {
                 isValidated = false
                 lastValidationCheckedStatus = false
@@ -535,7 +576,6 @@ class ITextField: UITextField, UITextFieldDelegate {
             _isTitleVisible = true
             self._title = UILabel(frame: self.frame)
             self._title.textColor = self.placeholderColor
-            //self._title.backgroundColor = UIColor.grayColor()
             self._title.font = self.font
             self._title.adjustsFontSizeToFitWidth = true
             self._title.minimumScaleFactor = 0.50
@@ -547,7 +587,7 @@ class ITextField: UITextField, UITextFieldDelegate {
             
             self.superview?.addSubview(self._title)
             
-            UIView.animateWithDuration(0.3) { () -> Void in
+            UIView.animateWithDuration(0.5) { () -> Void in
                 
                 self._title.frame.origin.y -= self.frame.size.height
                 self._title.frame.size.width -= self.frame.size.width/2
@@ -722,7 +762,7 @@ class ITextField: UITextField, UITextFieldDelegate {
         if isLog && data != nil{
             dispatch_async(dispatch_get_main_queue(),{
                 
-                // For Swift 1.2
+                // For Swift 2.0
                 print("\(data!)")
                 print("\n") // for new line after each log
                 
@@ -818,6 +858,45 @@ extension UIView {
         }
         
         return _getTextFieldsWithPriorityAndCheckIsValid(allITextfields)
+        
+    }
+    
+    func getTextFieldsWithChangedText()->[ITextField]{
+        
+        // get all tf in view
+        var allITextfields = [ITextField]()
+        
+        // check if scroll view or not
+        
+        for _subview in self.subviews {
+            
+            //iLog("\(self.dynamicType), \(__FUNCTION__), _subview.dynamicType \(_subview.dynamicType)")
+            
+            // if scroll view then find in scroll subviews
+            if "\(_subview.dynamicType)" == "UIScrollView" {
+                
+                for __subview in _subview.subviews {
+                    
+                    if let _iTextField = __subview as? ITextField {
+                        if _iTextField.isTextChanged && _iTextField.isValidated {
+                            allITextfields.append(_iTextField)
+                        }
+                    }
+                    
+                }
+                
+            }else{ // all textfields direct in uiview
+                
+                if let _iTextField = _subview as? ITextField {
+                    if _iTextField.isTextChanged && _iTextField.isValidated {
+                        allITextfields.append(_iTextField)
+                    }
+                }
+                
+            }
+        }
+        
+        return allITextfields
         
     }
     
@@ -945,7 +1024,7 @@ extension UIViewController {
                         let someExtraDistance: CGFloat = 10.0 // some distance from textfield for better user experience.
                         var distanceFromTFToKeyboard = (self.view.frame.height - activeTextField.frame.maxY) - keyboardSize.height
                         
-                        print("distanceFromTFToKeyboard: \(distanceFromTFToKeyboard)")
+                        iLog("distanceFromTFToKeyboard: \(distanceFromTFToKeyboard)")
                         if distanceFromTFToKeyboard == -19.0 { // when suggestion view open
                             self.moveViewWithIncreaseORDecreaseY(19.0 + someExtraDistance, _duration: duration!, _options: options)
                         }else if distanceFromTFToKeyboard < 0 {
@@ -1070,7 +1149,7 @@ extension UIViewController {
 
 
 
-let isLog = true
+let isLog = false
 
 func iLog(data: AnyObject?){
     if isLog && data != nil{

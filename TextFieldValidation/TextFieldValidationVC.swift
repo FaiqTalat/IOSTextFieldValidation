@@ -25,6 +25,10 @@ class TextFieldValidationVC: UIViewController {
         textField3.setValidation(1, maxTextLimit: 100, keyboardType: UIKeyboardType.PhonePad)
         textField4.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, secondTextField: textField5)
 
+        textField1.text = "faiqtalat@gmail.com"
+        textField2.text = "Faiq Talat"
+        textField3.text = "+923402028150"
+        
     }
     
 
@@ -34,8 +38,18 @@ class TextFieldValidationVC: UIViewController {
     }
 
     @IBAction func validateAllFields(sender: AnyObject) {
+        
+        
         let isAllTextFieldsValidated = self.view.validateAllTextFields()
-        print("isAllTextFieldsValidated: \(isAllTextFieldsValidated)")
+        print("\(self.dynamicType), \(__FUNCTION__), isAllTextFieldsValidated: \(isAllTextFieldsValidated)")
+        
+        let allTextFieldsWithChangedText = self.view.getTextFieldsWithChangedText()
+        for _textfield in allTextFieldsWithChangedText {
+            print("\(self.dynamicType), \(__FUNCTION__), changedTextField: \(_textfield.placeholder!) with new text: \(_textfield.text!) \n\n")
+        }
+        
+        
+        
     }
     
     
