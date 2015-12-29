@@ -18,6 +18,16 @@ class ITextField: UITextField, UITextFieldDelegate {
         self.forceToResign = false
         self.forceToEdit = false
         
+        if text!.textLength() > 0 && firstTextField != nil && firstTextField?.text == self.text { // first TF and second TF Text is same like old pass and new pass is same
+            if self.placeholder != nil {
+                isValidated = false
+                lastValidationCheckedStatus = false
+                _showValidationMsg("Same \(self.placeholder!)")
+                changeLinesColor(inValidLineColor)
+                return false
+            }
+        }
+        
         if isRequired { // when required so first validate then return validated or not
             iLog("\(className), \(__FUNCTION__), isRequired")
             return validate()
@@ -48,6 +58,9 @@ class ITextField: UITextField, UITextFieldDelegate {
     var isHeightInitialized = false
     let placeholderColor = UIColor(red: 199.0/255, green: 199.0/255, blue: 205.0/255, alpha: 1.0)
     let padding = UIEdgeInsets(top: 0, left: 10, bottom: 3, right: 10);
+    
+    var firstTextField: ITextField?
+    var secondTextField: ITextField?
     
     // validation settings
     var watchValidation = false
@@ -101,6 +114,7 @@ class ITextField: UITextField, UITextFieldDelegate {
     let bottomLine = CALayer()
     let leftLine = CALayer()
     let rightLine = CALayer()
+    
     
     
     // initialize
@@ -271,6 +285,16 @@ class ITextField: UITextField, UITextFieldDelegate {
         iLog("\(className), \(__FUNCTION__), newText: \(textField.text)")
         manageTitle()
         
+        if firstTextField != nil && firstTextField?.text == self.text { // first TF and second TF Text is same like old pass and new pass is same
+            if self.placeholder != nil {
+                isValidated = false
+                lastValidationCheckedStatus = false
+                _showValidationMsg("Same \(self.placeholder!)")
+                changeLinesColor(inValidLineColor)
+                return
+            }
+        }
+        
         if !isRequired && text!.textLength() < 1 { // optional field and nothing is written in text
             
             isValidated = true
@@ -301,7 +325,34 @@ class ITextField: UITextField, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
+
+        if firstTextField != nil && firstTextField?.text == self.text { // first TF and second TF Text is same like old pass and new pass is same
+            if self.placeholder != nil {
+                isValidated = false
+                lastValidationCheckedStatus = false
+                _showValidationMsg("Same \(self.placeholder!)")
+                changeLinesColor(inValidLineColor)
+                return false
+            }
+        }
+        
         textField.resignFirstResponder()
+        
+        // when two textfield joined together like old password and new password scenario
+        if isValidated && self.text?.textLength() > 0 && secondTextField != nil {
+            secondTextField!.isRequired = true
+            secondTextField!.isValidated = false
+            secondTextField!.isValid
+            return false
+        }else if self.text?.textLength() < 1 && secondTextField != nil {
+            secondTextField!.isRequired = false
+            secondTextField!.isValidated = true
+            secondTextField!.text = ""
+            secondTextField!.isValid
+            hideOptionalORRequiredMsg()
+            return false
+        }
+        
         self.superview?.validateAllTextFields()
         return true
     }
@@ -365,6 +416,31 @@ class ITextField: UITextField, UITextFieldDelegate {
         
         self.forceToResign = true
         
+        if firstTextField != nil && firstTextField?.text == self.text { // first TF and second TF Text is same like old pass and new pass is same
+            if self.placeholder != nil {
+                isValidated = false
+                lastValidationCheckedStatus = false
+                _showValidationMsg("Same \(self.placeholder!)")
+                changeLinesColor(inValidLineColor)
+                return
+            }
+        }
+        
+        // when two textfield joined together like old password and new password scenario
+        if isValidated && self.text?.textLength() > 0 && secondTextField != nil {
+            secondTextField!.isRequired = true
+            secondTextField!.isValidated = false
+            secondTextField!.isValid
+            return
+        }else if self.text?.textLength() < 1 && secondTextField != nil {
+            secondTextField!.isRequired = false
+            secondTextField!.isValidated = true
+            secondTextField!.text = ""
+            secondTextField!.isValid
+            hideOptionalORRequiredMsg()
+            return
+        }
+        
         if !isRequired && text!.textLength() < 1 { // optional field and nothing is written in text
             hideOptionalORRequiredMsg()
             return
@@ -385,6 +461,7 @@ class ITextField: UITextField, UITextFieldDelegate {
     
     // MARK: Validation Methods
     
+    // min , max and optional
     func setValidation(minTextLimit: Int, maxTextLimit: Int){
         iLog("\(className), \(__FUNCTION__), minLimit: \(minTextLimit), maxLimit: \(maxTextLimit)")
         
@@ -393,6 +470,7 @@ class ITextField: UITextField, UITextFieldDelegate {
         self.maxTextLimit = maxTextLimit
         
     }
+    // min and max with keyboard type and optional
     func setValidation(minTextLimit: Int, maxTextLimit: Int, keyboardType: UIKeyboardType){
         iLog("\(className), \(__FUNCTION__), minLimit: \(minTextLimit), maxLimit: \(maxTextLimit), keyboardType.hashValue: \(keyboardType.hashValue)")
         
@@ -402,6 +480,7 @@ class ITextField: UITextField, UITextFieldDelegate {
         self.keyboardType = keyboardType
         
     }
+    // min and max with keyboard type and required
     func setValidation(minTextLimit: Int, maxTextLimit: Int, keyboardType: UIKeyboardType, isRequired: Bool){
         iLog("\(className), \(__FUNCTION__), minLimit: \(minTextLimit), maxLimit: \(maxTextLimit), keyboardType.hashValue: \(keyboardType.hashValue)")
         
@@ -410,6 +489,22 @@ class ITextField: UITextField, UITextFieldDelegate {
         self.maxTextLimit = maxTextLimit
         self.keyboardType = keyboardType
         self.isRequired = isRequired
+    }
+
+    // min and max with keyboard type and optional
+    func setValidation(minTextLimit: Int, maxTextLimit: Int, keyboardType: UIKeyboardType, secondTextField: ITextField){
+        iLog("\(className), \(__FUNCTION__), minLimit: \(minTextLimit), maxLimit: \(maxTextLimit), keyboardType.hashValue: \(keyboardType.hashValue)")
+        
+        watchValidation = true
+        self.minTextLimit = minTextLimit
+        self.maxTextLimit = maxTextLimit
+        self.keyboardType = keyboardType
+        
+        // also validate another textfield when first textfield is validated.
+        self.secondTextField = secondTextField
+        self.secondTextField!.setValidation(minTextLimit, maxTextLimit: maxTextLimit, keyboardType: keyboardType)
+        self.secondTextField!.firstTextField = self
+        
     }
     
     func removeValidation(){
@@ -700,7 +795,7 @@ extension UIView {
         
         for _subview in self.subviews {
             
-            iLog("\(self.dynamicType), \(__FUNCTION__), _subview.dynamicType \(_subview.dynamicType)")
+            //iLog("\(self.dynamicType), \(__FUNCTION__), _subview.dynamicType \(_subview.dynamicType)")
             
             // if scroll view then find in scroll subviews
             if "\(_subview.dynamicType)" == "UIScrollView" {

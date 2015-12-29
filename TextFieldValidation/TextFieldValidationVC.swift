@@ -23,8 +23,7 @@ class TextFieldValidationVC: UIViewController {
         textField1.setValidation(6, maxTextLimit: 100, keyboardType: UIKeyboardType.EmailAddress, isRequired: true)
         textField2.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, isRequired: true)
         textField3.setValidation(1, maxTextLimit: 100, keyboardType: UIKeyboardType.PhonePad)
-        textField4.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
-        textField5.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
+        textField4.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, secondTextField: textField5)
 
     }
     
