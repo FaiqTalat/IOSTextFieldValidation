@@ -8,7 +8,6 @@ Advantage:
 3. Imp can set minimum or maximum range characters of any type string for names , integer for numbers and email for emailaddress.
 4. required and optional functionality when required field is empty so show red signal on validation and go optional field as empty
 5. Even Textfield in in scroll view so auto adjust positions of keyboard and clicked component.
-6. 
 
 Features Added: (password, confirmPass, oldPass, newPass and much more)
 
