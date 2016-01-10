@@ -2,6 +2,8 @@
 Make your UITextField Validation Free, Easy And Fast. (Stable Version 2.0 Completed)
 Note: Varsion 2.0 Highly Recommended with Xcode 7.2 , Swift 2.2 And iOS 9.2 (last updated on January 10, 2016)
 
+<img alt="Demo Overview" src="https://github.com/FaiqTalat/IOSTextFieldValidation/blob/master/other/iTextFieldOverview.gif">
+
 How To Use?
 1. Download ITextField.swift and import in your xcode project (check on copy if needed)
 2. from storyboard select a UITextField then (show utilities panel if not already) click on "Identity Inspector" and type ITextField in class
