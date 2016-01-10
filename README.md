@@ -2,6 +2,26 @@
 Make your UITextField Validation Free, Easy And Fast. (Stable Version 2.0 Completed)
 Note: Varsion 2.0 Highly Recommended with Xcode 7.2 , Swift 2.2 And iOS 9.2 (last updated on January 10, 2016)
 
+How To Use?
+1. Download ITextField.swift and import in your xcode project (check on copy if needed)
+2. from storyboard select a UITextField then (show utilities panel if not already) click on "Identity Inspector" and type ITextField in class
+3. give any textfield any validation in viewDidLoad like this,
+
+        // Required TextFields
+        firstNameTF.setValidation(3, maxTextLimit: 100, keyboardType: .Alphabet, isRequired: true)
+        lastNameTF.setValidation(3, maxTextLimit: 100, keyboardType: .Alphabet, isRequired: true)
+        ageTF.setValidation(2, maxTextLimit: 100, keyboardType: UIKeyboardType.NumberPad, isRequired: true)
+        languageTF.setValidation(3, maxTextLimit: 100, keyboardType: .Alphabet, isRequired: true)
+        addressTF.setValidation(2, maxTextLimit: 200, keyboardType: .Alphabet, isRequired: true)
+        cityTF.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, isRequired: true)
+        countryTF.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, isRequired: true)
+        
+        // Optional TextFields
+        websiteTF.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.URL)
+        contactNumberTF.setValidation(1, maxTextLimit: 100, keyboardType: UIKeyboardType.PhonePad)
+        professionalTF.setValidation(1, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
+        emailAddressTF.setValidation(6, maxTextLimit: 100, keyboardType: UIKeyboardType.EmailAddress)
+
 Advantage:
 1. auto component location adjestment on keyboard appear clear visible when keyboard appear or disappear.
 2. set custom space from kayboard to intractable component.
