@@ -14,7 +14,6 @@
 		5D8ECA321C2C262D005B9B51 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5D8ECA301C2C262D005B9B51 /* LaunchScreen.xib */; };
 		5D8ECA3E1C2C262D005B9B51 /* TextFieldValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8ECA3D1C2C262D005B9B51 /* TextFieldValidationTests.swift */; };
 		5D8ECA481C2C2943005B9B51 /* ITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8ECA471C2C2943005B9B51 /* ITextField.swift */; };
-		5D8ECA4A1C2C2BFC005B9B51 /* helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8ECA491C2C2BFC005B9B51 /* helper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,7 +38,6 @@
 		5D8ECA3C1C2C262D005B9B51 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5D8ECA3D1C2C262D005B9B51 /* TextFieldValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldValidationTests.swift; sourceTree = "<group>"; };
 		5D8ECA471C2C2943005B9B51 /* ITextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ITextField.swift; sourceTree = "<group>"; };
-		5D8ECA491C2C2BFC005B9B51 /* helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = helper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,7 +86,6 @@
 				5D8ECA2E1C2C262D005B9B51 /* Images.xcassets */,
 				5D8ECA301C2C262D005B9B51 /* LaunchScreen.xib */,
 				5D8ECA251C2C262D005B9B51 /* Supporting Files */,
-				5D8ECA491C2C2BFC005B9B51 /* helper.swift */,
 			);
 			path = TextFieldValidation;
 			sourceTree = "<group>";
@@ -223,7 +220,6 @@
 				5D8ECA2A1C2C262D005B9B51 /* TextFieldValidationVC.swift in Sources */,
 				5D8ECA481C2C2943005B9B51 /* ITextField.swift in Sources */,
 				5D8ECA281C2C262D005B9B51 /* AppDelegate.swift in Sources */,
-				5D8ECA4A1C2C2BFC005B9B51 /* helper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

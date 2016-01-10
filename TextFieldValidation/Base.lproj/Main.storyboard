@@ -17,20 +17,12 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pLu-si-jHf">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pLu-si-jHf">
                                 <rect key="frame" x="0.0" y="70" width="600" height="520"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cqN-kt-v1m" userLabel="Content View">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="530"/>
                                         <subviews>
-                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="First Name" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="HXI-tp-HfV" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
-                                                <rect key="frame" x="20" y="68" width="275" height="25"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="25" id="PJo-gh-jDm"/>
-                                                </constraints>
-                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                <textInputTraits key="textInputTraits" keyboardType="namePhonePad"/>
-                                            </textField>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Last Name" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="7V1-5F-M7f" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
                                                 <rect key="frame" x="305" y="68" width="275" height="25"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -119,6 +111,14 @@
                                                     <action selector="validateAllFields:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Dz8-Pm-tja"/>
                                                 </connections>
                                             </button>
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="First Name" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="HXI-tp-HfV" customClass="ITextField" customModule="TextFieldValidation" customModuleProvider="target">
+                                                <rect key="frame" x="20" y="68" width="275" height="25"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="25" id="PJo-gh-jDm"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="namePhonePad"/>
+                                            </textField>
                                         </subviews>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
@@ -185,7 +185,7 @@
                                     <constraint firstItem="cqN-kt-v1m" firstAttribute="top" secondItem="pLu-si-jHf" secondAttribute="top" id="rNF-ZA-pOc"/>
                                 </constraints>
                             </scrollView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Demo Admission Form" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wS4-RQ-PUf">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Admission Form" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wS4-RQ-PUf">
                                 <rect key="frame" x="0.0" y="20" width="600" height="40"/>
                                 <color key="backgroundColor" red="0.70675526489999996" green="0.70675526489999996" blue="0.70675526489999996" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>

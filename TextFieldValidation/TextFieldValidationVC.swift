@@ -23,6 +23,7 @@ class TextFieldValidationVC: UIViewController {
     @IBOutlet weak var contactNumberTF: ITextField!
     @IBOutlet weak var professionalTF: ITextField!
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -54,6 +55,15 @@ class TextFieldValidationVC: UIViewController {
         
         // validate all textfields
         let isAllTextFieldsValidated = self.view.validateAllTextFields()
+        
+        if isAllTextFieldsValidated {
+            let alert = UIAlertController(title: "Validation Message:", message: "All Fields are validated", preferredStyle: UIAlertControllerStyle.Alert)
+            let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (alertaction) -> Void in
+                alert.dismissViewControllerAnimated(true, completion: nil)
+            })
+            alert.addAction(okAction)
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
         
         print("\(self.dynamicType), \(__FUNCTION__), isAllTextFieldsValidated: \(isAllTextFieldsValidated)")
         
