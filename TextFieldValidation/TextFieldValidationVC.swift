@@ -10,25 +10,38 @@ import UIKit
 
 class TextFieldValidationVC: UIViewController {
     
-    @IBOutlet weak var textField1: ITextField!
-    @IBOutlet weak var textField2: ITextField!
-    @IBOutlet weak var textField3: ITextField!
-    @IBOutlet weak var textField4: ITextField!
-    @IBOutlet weak var textField5: ITextField!
+    // All Text Fields
+    @IBOutlet weak var firstNameTF: ITextField!
+    @IBOutlet weak var lastNameTF: ITextField!
+    @IBOutlet weak var ageTF: ITextField!
+    @IBOutlet weak var languageTF: ITextField!
+    @IBOutlet weak var addressTF: ITextField!
+    @IBOutlet weak var emailAddressTF: ITextField!
+    @IBOutlet weak var cityTF: ITextField!
+    @IBOutlet weak var countryTF: ITextField!
+    @IBOutlet weak var websiteTF: ITextField!
+    @IBOutlet weak var contactNumberTF: ITextField!
+    @IBOutlet weak var professionalTF: ITextField!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        textField1.setValidation(6, maxTextLimit: 100, keyboardType: UIKeyboardType.EmailAddress, isRequired: true)
-        textField2.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, isRequired: true)
-        textField3.setValidation(1, maxTextLimit: 100, keyboardType: UIKeyboardType.PhonePad)
-        textField4.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, secondTextField: textField5)
-
-        textField1.text = "Faiqtalat@gmail.com"
-        textField2.text = "Faiq Talat"
-        textField3.text = "+923402028150"
+        // Required TextFields
+        firstNameTF.setValidation(3, maxTextLimit: 100, keyboardType: .Alphabet, isRequired: true)
+        lastNameTF.setValidation(3, maxTextLimit: 100, keyboardType: .Alphabet, isRequired: true)
+        ageTF.setValidation(2, maxTextLimit: 100, keyboardType: UIKeyboardType.NumberPad, isRequired: true)
+        languageTF.setValidation(3, maxTextLimit: 100, keyboardType: .Alphabet, isRequired: true)
+        addressTF.setValidation(2, maxTextLimit: 200, keyboardType: .Alphabet, isRequired: true)
+        cityTF.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, isRequired: true)
+        countryTF.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.Default, isRequired: true)
         
+        // Optional TextFields
+        websiteTF.setValidation(3, maxTextLimit: 100, keyboardType: UIKeyboardType.URL)
+        contactNumberTF.setValidation(1, maxTextLimit: 100, keyboardType: UIKeyboardType.PhonePad)
+        professionalTF.setValidation(1, maxTextLimit: 100, keyboardType: UIKeyboardType.Default)
+        emailAddressTF.setValidation(6, maxTextLimit: 100, keyboardType: UIKeyboardType.EmailAddress)
+ 
     }
     
 
@@ -39,12 +52,19 @@ class TextFieldValidationVC: UIViewController {
 
     @IBAction func validateAllFields(sender: AnyObject) {
         
+        // validate all textfields
         let isAllTextFieldsValidated = self.view.validateAllTextFields()
+        
         print("\(self.dynamicType), \(__FUNCTION__), isAllTextFieldsValidated: \(isAllTextFieldsValidated)")
         
+        // get all newly entered OR Text changed with new text Fields
         let allTextFieldsWithChangedText = self.view.getTextFieldsWithChangedText()
+        
         for _textfield in allTextFieldsWithChangedText {
+            
+            // do anything you want with newly entered OR Text changed with new text Fields
             print("\(self.dynamicType), \(__FUNCTION__), changedTextField: \(_textfield.placeholder!) with new text: \(_textfield.text!) \n\n")
+            
         }
         
     }
