@@ -960,16 +960,12 @@ extension UIView {
             // ascending all tf with respect to Y
             for _iTextField in textfields{
                 //iLog("\(self.dynamicType), \(__FUNCTION__), (for _iTextField in textfields) \(_iTextField.placeholder)")
-                
-                if !_iTextField.isValidated {
-                    let _iTextField_XY = _iTextField.frame.origin.x + _iTextField.frame.origin.y
-                    _allTFWithXY[_iTextField_XY] = _iTextField
-                }
-                
+                let _iTextField_XY = _iTextField.frame.origin.y
+                _allTFWithXY[_iTextField_XY] = _iTextField
             }
             
             let allTFSortedByY = Array(_allTFWithXY.keys).sort()
-            iLog("\(self.dynamicType), \(__FUNCTION__), allTFSortedByY \(allTFSortedByY)")
+            //iLog("\(self.dynamicType), \(__FUNCTION__), allTFSortedByY \(allTFSortedByY)")
             
             for _iTextFieldY in allTFSortedByY{
                 if let _iTextField = _allTFWithXY[_iTextFieldY]{
@@ -1156,6 +1152,58 @@ extension UIView {
         return nil
     }
     
+    
+    func isVCHasITextField()->Bool{
+        
+        for _subview in self.subviews {
+            
+            iLog("\(self.superclass), \(self.dynamicType), \(__FUNCTION__), _subview.dynamicType \(_subview.dynamicType)")
+            
+            // if scroll view then find in scroll subviews
+            if "\(_subview.dynamicType)" == "UIScrollView" {
+                
+                for __subview in _subview.subviews {
+                    iLog("\(self.dynamicType), \(__FUNCTION__), __subview.dynamicType \(__subview.dynamicType)")
+                    
+                    
+                    if let _iTextField = __subview as? ITextField {
+                        iLog("\(self.dynamicType), \(__FUNCTION__), __subview.dynamicType \(__subview.dynamicType), _iTextField.placeholder: \(_iTextField.placeholder)")
+                        return true
+                    }
+                    
+                    
+                    // if content view in scroll view so find in content view
+                    if "\(__subview.dynamicType)" == "UIView" {
+                        for ___subview in __subview.subviews {
+                            iLog("\(self.dynamicType), \(__FUNCTION__), __subview.dynamicType \(___subview.dynamicType)")
+                            
+                            if let __iTextField = ___subview as? ITextField {
+                                iLog("\(self.dynamicType), \(__FUNCTION__), __subview.dynamicType \(___subview.dynamicType), _iTextField.placeholder: \(__iTextField.placeholder)")
+                                return true
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                    
+                }
+                
+            }else{ // all textfields direct in uiview
+                
+                if _subview.isFirstResponder() {
+                    if let _iTextField = _subview as? ITextField {
+                        return true
+                    }
+                }
+                
+            }
+        }
+        
+        return false
+    }
+    
+    
     func getScrollViewIfAny()->UIScrollView?{
         
         for _subview in self.subviews {
@@ -1172,6 +1220,27 @@ extension UIView {
 }
 
 extension UIViewController {
+    
+    private struct extraProperties {
+        static var _currentObjYUpByKeyboard: CGFloat = 0.0 // default
+        static var _keybaordUpComingCount: Int = 0
+    }
+    private var currentObjYUpByKeyboard: CGFloat {
+        get{
+            return extraProperties._currentObjYUpByKeyboard
+        }
+        set{
+            extraProperties._currentObjYUpByKeyboard = newValue
+        }
+    }
+    private var keybaordUpComingCount: Int {
+        get{
+            return extraProperties._keybaordUpComingCount
+        }
+        set{
+            extraProperties._keybaordUpComingCount = newValue
+        }
+    }
     
     public override static func initialize() {
         
@@ -1211,7 +1280,7 @@ extension UIViewController {
         
         // custom did load functions
         
-        iLog("\(__FUNCTION__): \(self.dynamicType)")
+        print("\(__FUNCTION__): \(self.dynamicType)")
         
         listenerOnKeyboardAppearORDisappear()
         
@@ -1238,6 +1307,9 @@ extension UIViewController {
             UIView.animateWithDuration(duration!, delay: 0.0, options: options, animations: { () -> Void in
                 
                 if notification.name == UIKeyboardWillShowNotification { // keyboard will up
+                    
+                    if self.keybaordUpComingCount >= 1 {return} // multi callback prevent
+                    self.keybaordUpComingCount += 1
                     
                     if let activeTextField = self.view.getFirstResponder() {// one field is active
                         
@@ -1287,7 +1359,11 @@ extension UIViewController {
                     }
                     
                 }else if notification.name == UIKeyboardWillHideNotification { // keyboard will down
-                    self.moveViewAtY(0.0, _duration: duration!, _options: options)
+                    self.keybaordUpComingCount = 0
+                    if self.view.isVCHasITextField() {
+                        self.moveViewAtY(0.0, _duration: duration!, _options: options, keyboardWillDown: true)
+                    }
+                    
                 }
                 
                 }, completion: nil)
@@ -1297,7 +1373,7 @@ extension UIViewController {
     }
     
     // helper func to move the view with all components
-    func moveViewAtY(_yAxis: CGFloat, _duration: Double, _options: UIViewAnimationOptions){
+    func moveViewAtY(_yAxis: CGFloat, _duration: Double, _options: UIViewAnimationOptions, keyboardWillDown: Bool = false){
         iLog("\(self.dynamicType), \(__FUNCTION__), _yAxis: \(_yAxis), _duration: \(_duration), _options: \(_options)")
         
         
@@ -1305,8 +1381,22 @@ extension UIViewController {
         // 1. when scrollview exist so work as scrollview nature.
         if let scrollView = self.view.getScrollViewIfAny() {
             iLog("\(self.dynamicType), \(__FUNCTION__), Old: scrollView.contentInset: \(scrollView.contentInset)")
-            scrollView.contentInset.top = _yAxis
-            scrollView.scrollRectToVisible(CGRect(x: scrollView.frame.origin.x, y: _yAxis, width: scrollView.frame.size.width, height: scrollView.frame.size.height), animated: false)
+            
+            // save old frame
+            if !keyboardWillDown { // keyboard will up
+                self.currentObjYUpByKeyboard = scrollView.frame.origin.y
+                
+                scrollView.contentInset.top = _yAxis
+                scrollView.scrollRectToVisible(CGRect(x: scrollView.frame.origin.x, y: _yAxis, width: scrollView.frame.size.width, height: scrollView.frame.size.height), animated: false)
+                
+            }else if keyboardWillDown { // keyboard will down (set obj to orignal frame as it before)
+                
+                scrollView.contentInset.top = self.currentObjYUpByKeyboard
+                scrollView.scrollRectToVisible(CGRect(x: scrollView.frame.origin.x, y: self.currentObjYUpByKeyboard, width: scrollView.frame.size.width, height: scrollView.frame.size.height), animated: false)
+                
+            }
+            
+            
             self.view.layoutIfNeeded() // update frames for view
             _updateLayoutSubviews() // update frames for all sub views
             iLog("\(self.dynamicType), \(__FUNCTION__), New: scrollView.contentInset: \(scrollView.contentInset)")
@@ -1325,7 +1415,19 @@ extension UIViewController {
                 if let _ = cons.secondItem as? UIView {
                     //iLog("\(self.dynamicType), \(__FUNCTION__), desc: \(cons.firstItem)| \(cons.secondItem)")
                     
-                    cons.constant = _yAxis
+                    
+                    // save old frame
+                    if !keyboardWillDown { // keyboard will up
+                        self.currentObjYUpByKeyboard = cons.constant
+                        
+                        cons.constant = _yAxis
+                        
+                    }else if keyboardWillDown { // keyboard will down (set obj to orignal frame as it before)
+                        
+                        cons.constant = self.currentObjYUpByKeyboard
+                        
+                    }
+                    
                     self.view.layoutIfNeeded() // update frames for view
                     _updateLayoutSubviews() // update frames for all sub views
                     
@@ -1334,15 +1436,41 @@ extension UIViewController {
                         
                         iLog("\(self.dynamicType), \(__FUNCTION__), self.view.frame: \(self.view.frame)")
                         
-                        self.view.frame.origin.y = 0.0
-                        if _yAxis > 0 {
-                            self.view.frame.origin.y -= _yAxis
-                        }else if _yAxis < 0 {
-                            self.view.frame.origin.y += _yAxis
+                        
+                        // save old frame
+                        if !keyboardWillDown { // keyboard will up
+                            self.currentObjYUpByKeyboard = self.view.frame.origin.y
+                            
+                            self.view.frame.origin.y = 0.0
+                            if _yAxis > 0 {
+                                self.view.frame.origin.y -= _yAxis
+                            }else if _yAxis < 0 {
+                                self.view.frame.origin.y += _yAxis
+                            }
+                            
+                        }else if keyboardWillDown { // keyboard will down (set obj to orignal frame as it before)
+                            
+                            self.view.frame.origin.y = self.currentObjYUpByKeyboard
+                            
                         }
                         
+                        
                     }else{
-                        self.view.frame.origin.y = 0.0
+                        
+                        
+                        // save old frame
+                        if !keyboardWillDown { // keyboard will up
+                            self.currentObjYUpByKeyboard = self.view.frame.origin.y
+                            
+                            self.view.frame.origin.y = 0.0
+                            
+                        }else if keyboardWillDown { // keyboard will down (set obj to orignal frame as it before)
+                            
+                            self.view.frame.origin.y = self.currentObjYUpByKeyboard
+                            
+                        }
+                        
+                        
                     }
                     
                 }
@@ -1430,3 +1558,11 @@ func iLog(data: AnyObject?){
         })
     }
 }
+
+
+
+
+
+
+
+
